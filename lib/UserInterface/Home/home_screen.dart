@@ -786,27 +786,25 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _footerColumn(String title, List<String> links) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              letterSpacing: 1.2,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            letterSpacing: 1.2,
           ),
-          const SizedBox(height: 24),
-          ...links.map(
-            (link) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(link, style: AppTextStyles.bodySmall),
-            ),
+        ),
+        const SizedBox(height: 24),
+        ...links.map(
+          (link) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(link, style: AppTextStyles.bodySmall),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
