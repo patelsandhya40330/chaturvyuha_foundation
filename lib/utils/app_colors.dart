@@ -3,26 +3,24 @@ import 'package:flutter/material.dart';
 class AppColor {
   AppColor._();
 
-  // Backgrounds
-  static const Color backgroundColor = Color(0xFFFFF9F0);
-  static const Color surface = Color(0xFFFFFCF7);
-  static const Color lightPrimary = Color(0xFFFFF0DC);
-  static const Color imagePlaceholder = Color(0xFFF4E8D8);
+  // Backgrounds - matching the light cream ivory in the screenshot
+  static const Color backgroundColor = Color(0xFFFDFBF7);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color cardBg = Color(0xFFF7F2EB);
+  static const Color lightPrimary = Color(0xFFF9F3EA);
 
-  // Brand
+  // Brand - Earthy bronze/brown for buttons and primary accents
   static const Color primary = Color(0xFFF18406);
+  static const Color secondary = Color(0xFFB48C5B);
 
-  // Text
-  static const Color heading = Color(0xFF4A2115);
-  static const Color bodyText = Color(0xFF786B62);
+  // Text colors
+  static const Color heading = Color(0xFF2C1B10);
+  static const Color bodyText = Color(0xFF5F544D);
   static const Color grey = Color(0xFF9E9E9E);
+  static const Color iconColor = Color(0xFF4A3427);
 
   // Borders and dividers
-  static const Color border = Color(0xFFEEDFCC);
-  static const Color cardBorder = Color(0xFFF0DFC9);
-
-  // Shadow — includes transparency
-  static const Color shadow = Color(0x0D4A2115);
+  static const Color border = Color(0xFFE8E0D5);
 
   // Basic colors
   static const Color white = Color(0xFFFFFFFF);

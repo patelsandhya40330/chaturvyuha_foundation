@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
-import 'package:chaturvyuha_foundation/data/sample_data.dart';
 import 'package:chaturvyuha_foundation/models/yoga_program.dart';
+
+import '../../dataProvider/foundation_provider.dart';
 
 class YogaMeditationScreen extends StatefulWidget {
   const YogaMeditationScreen({super.key});
@@ -33,7 +35,7 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
           title: const Text('Demo Registration Entry'),
           content: Text(
             'Thank you, ${_nameController.text}. This is a working frontend prototype demonstration. '
-            'Your request for \"$_selectedProgram\" was validated locally, but no remote data transactions were processed.',
+            'Your request for "$_selectedProgram" was validated locally, but no remote data transactions were processed.',
           ),
           actions: [
             TextButton(
@@ -52,7 +54,8 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredPrograms = SampleData.yogaPrograms.where((p) {
+    final provider = context.watch<FoundationProvider>();
+    final filteredPrograms = provider.yogaPrograms.where((p) {
       if (_activeFilter == 'ALL') return true;
       if (_activeFilter == 'YOGA') return p.type == ProgramType.yoga;
       return p.type == ProgramType.meditation;
@@ -286,15 +289,16 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
                                     filled: true,
                                     border: OutlineInputBorder(),
                                   ),
-                                  items: SampleData.yogaPrograms.map((p) {
+                                  items: provider.yogaPrograms.map((p) {
                                     return DropdownMenuItem<String>(
                                       value: p.title,
                                       child: Text(p.title),
                                     );
                                   }).toList(),
                                   onChanged: (val) {
-                                    if (val != null)
+                                    if (val != null) {
                                       setState(() => _selectedProgram = val);
+                                    }
                                   },
                                 ),
                                 const SizedBox(height: 24),

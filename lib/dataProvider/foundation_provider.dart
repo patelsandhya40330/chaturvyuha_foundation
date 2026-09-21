@@ -6,12 +6,12 @@ import '../models/media_item.dart';
 import '../models/course_item.dart';
 import '../models/yoga_program.dart';
 
-class SampleData {
+class FoundationProvider extends ChangeNotifier {
   // Demo/Sample Data Flag Indicator
-  static const bool isDemoData = true;
+  final bool isDemoData = true;
 
   // 1. About Screen Sample Data
-  static final List<TeamMember> teamMembers = [
+  final List<TeamMember> teamMembers = [
     TeamMember(
       name: "Acharya Shridhar Sharma",
       role: "Founder & Spiritual Director",
@@ -32,12 +32,12 @@ class SampleData {
     ),
   ];
 
-  static const String logoExplanation =
+  final String logoExplanation =
       "The official logo represents the ultimate absolute unity (Brahman). The circle symbolizes infinity and completeness, "
       "while the central sacred seal represents the four primary core aspects of creation, knowledge, and inner reflection.";
 
   // 2. Dharma & Sanskriti Sample Data
-  static final List<Map<String, String>> dharmaContents = [
+  final List<Map<String, String>> dharmaContents = [
     {
       "title": "Understanding Sanatana Dharma",
       "category": "Philosophy",
@@ -64,7 +64,7 @@ class SampleData {
     },
   ];
 
-  static final List<Map<String, String>> culturalCalendar = [
+  final List<Map<String, String>> culturalCalendar = [
     {
       "event": "Maha Shivaratri Vrat",
       "date": "March 8, 2024",
@@ -85,7 +85,7 @@ class SampleData {
   ];
 
   // 3. Yoga & Meditation Programs Data
-  static final List<YogaProgram> yogaPrograms = [
+  final List<YogaProgram> yogaPrograms = [
     YogaProgram(
       title: "Vedic Hatha Yoga Flow",
       description:
@@ -113,7 +113,7 @@ class SampleData {
   ];
 
   // 4. Vedic Education Sample Data
-  static final List<CourseItem> courses = [
+  final List<CourseItem> courses = [
     CourseItem(
       title: "Foundations of Upanishadic Wisdom",
       description:
@@ -145,7 +145,7 @@ class SampleData {
   ];
 
   // 5. Events & Programs Data
-  static final List<EventItem> events = [
+  final List<EventItem> events = [
     EventItem(
       title: "Global Peace Chant Gathering",
       description:
@@ -174,7 +174,10 @@ class SampleData {
       time: "5:30 PM",
       location: "North Courtyard",
       status: EventStatus.completed,
-      galleryImages: ["assets/chaturvedal-1.png", "assets/chaturvedal-1.png"],
+      galleryImages: [
+        "assets/chaturvedal-logo.png",
+        "assets/chaturvedal-logo.png",
+      ],
     ),
     EventItem(
       title: "Sanskrit Youth Forum 2024",
@@ -189,7 +192,7 @@ class SampleData {
   ];
 
   // 6. Knowledge / Articles Sample Data
-  static final List<ArticleItem> articles = [
+  final List<ArticleItem> articles = [
     ArticleItem(
       id: "art-1",
       title: "The Role of Mindful Pauses in Modern Routines",
@@ -229,13 +232,13 @@ class SampleData {
   ];
 
   // 7. Media Sample Data
-  static final List<MediaItem> mediaItems = [
+  final List<MediaItem> mediaItems = [
     MediaItem(
       title: "Chanting at Dusk Ceremony",
       description: "High-resolution portrait of a evening prayer invocation.",
       category: "Festivals",
       type: MediaType.photo,
-      assetPath: "assets/chaturvedal-1.png",
+      assetPath: "assets/chaturvedal-logo.png",
     ),
     MediaItem(
       title: "Inaugural Speech 2023",
@@ -243,14 +246,14 @@ class SampleData {
           "Video record of the initial foundational introduction address.",
       category: "Discourses",
       type: MediaType.video,
-      assetPath: "assets/chaturvedal-1.png",
+      assetPath: "assets/chaturvedal-logo.png",
     ),
     MediaItem(
       title: "Guided Breath Meditation Audio Track",
       description: "A calming 15-minute voice guide for daily practice.",
       category: "Practice",
       type: MediaType.audio,
-      assetPath: "assets/chaturvedal-1.png",
+      assetPath: "assets/chaturvedal-logo.png",
     ),
     MediaItem(
       title: "Vedic Philosophy Study Guide",
@@ -258,7 +261,7 @@ class SampleData {
           "Comprehensive outline of key text definitions and reading assignments.",
       category: "Education",
       type: MediaType.document,
-      assetPath: "assets/chaturvedal-1.png",
+      assetPath: "assets/chaturvedal-logo.png",
     ),
   ];
 }

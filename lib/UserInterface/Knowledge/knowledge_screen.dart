@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
-import 'package:chaturvyuha_foundation/data/sample_data.dart';
 import 'package:chaturvyuha_foundation/models/article_item.dart';
+
+import '../../dataProvider/foundation_provider.dart';
 
 class KnowledgeScreen extends StatefulWidget {
   const KnowledgeScreen({super.key});
@@ -25,11 +27,13 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<FoundationProvider>();
+
     if (_activeArticle != null) {
       return _buildArticleDetail(_activeArticle!);
     }
 
-    final filteredArticles = SampleData.articles.where((art) {
+    final filteredArticles = provider.articles.where((art) {
       final matchesSearch =
           art.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           art.excerpt.toLowerCase().contains(_searchQuery.toLowerCase());
@@ -266,7 +270,7 @@ class _KnowledgeScreenState extends State<KnowledgeScreen> {
                   const SizedBox(height: 48),
 
                   // Related section dummy
-                  Text('RELATED ARTICLES', style: AppTextStyles.title),
+                  Text('RELATED ARTICLES', style: AppTextStyles.sectionLabel),
                   const SizedBox(height: 12),
                   const Text(
                     '// Related article previews would appear here based on IDs provided in metadata.',

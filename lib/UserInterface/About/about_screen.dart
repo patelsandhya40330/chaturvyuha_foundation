@@ -1,7 +1,8 @@
+import 'package:chaturvyuha_foundation/dataProvider/foundation_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
-import 'package:chaturvyuha_foundation/data/sample_data.dart';
 import 'package:chaturvyuha_foundation/models/team_member.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -9,6 +10,8 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<FoundationProvider>();
+
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
       body: SafeArea(
@@ -37,7 +40,7 @@ class AboutScreen extends StatelessWidget {
                         const SizedBox(height: 48),
 
                         // 3. Logo & Identity explanation
-                        _buildLogoExplanation(),
+                        _buildLogoExplanation(provider),
                         const SizedBox(height: 48),
 
                         // 4. History/Timeline
@@ -58,7 +61,7 @@ class AboutScreen extends StatelessWidget {
                         const SizedBox(height: 48),
 
                         // 6. Leadership/Team
-                        _buildLeadershipTeam(isDesktop),
+                        _buildLeadershipTeam(isDesktop, provider),
                         const SizedBox(height: 48),
 
                         // 7. Organization & Contact Info
@@ -109,8 +112,8 @@ class AboutScreen extends StatelessWidget {
       child: Column(
         children: [
           Image.asset(
-            'assets/chaturvedal-1.png',
-            height: 160,
+            'assets/chaturvedal-logo.png',
+            height: 120,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) => const Icon(
               Icons.spa_outlined,
@@ -118,14 +121,25 @@ class AboutScreen extends StatelessWidget {
               color: AppColor.primary,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+          const Text(
+            'CHATURVEDA FOUNDATION',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColor.primary,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+            ),
+          ),
+          const SizedBox(height: 8),
           const Text(
             'Wisdom • Wellness • Community',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: AppColor.primary,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
+              color: AppColor.grey,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
               height: 1.6,
             ),
           ),
@@ -211,7 +225,7 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoExplanation() {
+  Widget _buildLogoExplanation(FoundationProvider provider) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(28),
@@ -226,7 +240,7 @@ class AboutScreen extends StatelessWidget {
             style: AppTextStyles.title,
           ),
           const SizedBox(height: 12),
-          const Text(SampleData.logoExplanation, style: AppTextStyles.body),
+          Text(provider.logoExplanation, style: AppTextStyles.body),
         ],
       ),
     );
@@ -365,7 +379,7 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLeadershipTeam(bool isDesktop) {
+  Widget _buildLeadershipTeam(bool isDesktop, FoundationProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -382,7 +396,7 @@ class AboutScreen extends StatelessWidget {
               return IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: SampleData.teamMembers
+                  children: provider.teamMembers
                       .map(
                         (m) => Expanded(
                           child: Padding(
@@ -396,7 +410,7 @@ class AboutScreen extends StatelessWidget {
               );
             }
             return Column(
-              children: SampleData.teamMembers
+              children: provider.teamMembers
                   .map(
                     (m) => Padding(
                       padding: const EdgeInsets.only(bottom: 20),

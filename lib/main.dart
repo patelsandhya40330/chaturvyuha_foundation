@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'UserInterface/Dashboard/dashboard_screen.dart';
+import 'dataProvider/foundation_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => FoundationProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

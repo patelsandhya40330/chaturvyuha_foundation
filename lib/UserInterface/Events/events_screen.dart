@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
-import 'package:chaturvyuha_foundation/data/sample_data.dart';
 import 'package:chaturvyuha_foundation/models/event_item.dart';
+
+import '../../dataProvider/foundation_provider.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -36,7 +38,8 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   void _registerForEvent() {
-    final eventObj = SampleData.events.firstWhere(
+    final provider = context.read<FoundationProvider>();
+    final eventObj = provider.events.firstWhere(
       (e) => e.title == _selectedEventTitle,
     );
 
@@ -78,6 +81,8 @@ class _EventsScreenState extends State<EventsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<FoundationProvider>();
+
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
       body: SafeArea(
@@ -123,7 +128,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         ),
                         const SizedBox(height: 16),
                         Column(
-                          children: SampleData.events.map((ev) {
+                          children: provider.events.map((ev) {
                             final bool isActionDisabled =
                                 ev.status == EventStatus.completed ||
                                 ev.status == EventStatus.cancelled;
@@ -328,7 +333,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                     filled: true,
                                     border: OutlineInputBorder(),
                                   ),
-                                  items: SampleData.events.map((e) {
+                                  items: provider.events.map((e) {
                                     return DropdownMenuItem<String>(
                                       value: e.title,
                                       child: Text(e.title),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
-import 'package:chaturvyuha_foundation/data/sample_data.dart';
 import 'package:chaturvyuha_foundation/models/media_item.dart';
+
+import '../../dataProvider/foundation_provider.dart';
 
 class MediaScreen extends StatefulWidget {
   const MediaScreen({super.key});
@@ -77,7 +79,8 @@ class _MediaScreenState extends State<MediaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = SampleData.mediaItems.where((item) {
+    final provider = context.watch<FoundationProvider>();
+    final filtered = provider.mediaItems.where((item) {
       final matchesSearch = item.title.toLowerCase().contains(
         _search.toLowerCase(),
       );

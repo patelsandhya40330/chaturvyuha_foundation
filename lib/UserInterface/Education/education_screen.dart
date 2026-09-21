@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
-import 'package:chaturvyuha_foundation/data/sample_data.dart';
 import 'package:chaturvyuha_foundation/models/course_item.dart';
+
+import '../../dataProvider/foundation_provider.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -51,6 +53,8 @@ class _EducationScreenState extends State<EducationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<FoundationProvider>();
+
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
       body: SafeArea(
@@ -96,7 +100,7 @@ class _EducationScreenState extends State<EducationScreen> {
                         ),
                         const SizedBox(height: 16),
                         Column(
-                          children: SampleData.courses.map((course) {
+                          children: provider.courses.map((course) {
                             return Container(
                               width: double.infinity,
                               margin: const EdgeInsets.only(bottom: 24),
@@ -267,7 +271,7 @@ class _EducationScreenState extends State<EducationScreen> {
                                     filled: true,
                                     border: OutlineInputBorder(),
                                   ),
-                                  items: SampleData.courses.map((c) {
+                                  items: provider.courses.map((c) {
                                     return DropdownMenuItem<String>(
                                       value: c.title,
                                       child: Text(c.title),

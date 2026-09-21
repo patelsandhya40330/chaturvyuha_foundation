@@ -1,11 +1,30 @@
 import 'package:flutter/material.dart';
-
 import 'app_colors.dart';
 
 class AppTextStyles {
   AppTextStyles._();
 
-  // Main landing-page heading
+  // Hero main heading - Large, bold, serif-like
+  static const TextStyle heroHeading = TextStyle(
+    fontSize: 72,
+    fontWeight: FontWeight.w800,
+    color: AppColor.heading,
+    fontFamily: 'Georgia', // Using a standard serif fallback
+    height: 1.1,
+    letterSpacing: -1.0,
+  );
+
+  // Secondary hero text (italic/serif)
+  static const TextStyle heroSubheading = TextStyle(
+    fontSize: 48,
+    fontWeight: FontWeight.w500,
+    fontStyle: FontStyle.italic,
+    color: AppColor.primary,
+    fontFamily: 'Georgia',
+    height: 1.2,
+  );
+
+  // Legacy heading (used in some screens)
   static const TextStyle heading = TextStyle(
     fontSize: 54,
     fontWeight: FontWeight.w700,
@@ -14,9 +33,9 @@ class AppTextStyles {
     letterSpacing: -0.8,
   );
 
-  // Section heading
+  // Standard headings
   static const TextStyle heading2 = TextStyle(
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: FontWeight.w700,
     color: AppColor.heading,
     height: 1.2,
@@ -38,36 +57,49 @@ class AppTextStyles {
     height: 1.3,
   );
 
-  // Introductory paragraph
+  // Nav buttons - centered, multi-line support
+  static const TextStyle navButton = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: AppColor.heading,
+    height: 1.2,
+  );
+
+  static const TextStyle navButtonActive = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w700,
+    color: AppColor.primary,
+    height: 1.2,
+  );
+
+  // Body text
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 18,
-    fontWeight: FontWeight.w400,
-    color: AppColor.bodyText,
-    height: 1.7,
-  );
-
-  // Regular paragraph
-  static const TextStyle body = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-    color: AppColor.bodyText,
-    height: 1.7,
-  );
-
-  // Card descriptions and supporting text
-  static const TextStyle bodySmall = TextStyle(
-    fontSize: 14,
     fontWeight: FontWeight.w400,
     color: AppColor.bodyText,
     height: 1.6,
   );
 
-  // Labels such as ABOUT US and OUR MISSION
+  static const TextStyle body = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: AppColor.bodyText,
+    height: 1.6,
+  );
+
+  static const TextStyle bodySmall = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColor.bodyText,
+    height: 1.5,
+  );
+
+  // Labels (e.g., WISDOM • WELLNESS)
   static const TextStyle sectionLabel = TextStyle(
     fontSize: 12,
     fontWeight: FontWeight.w700,
     color: AppColor.primary,
-    letterSpacing: 2,
+    letterSpacing: 2.0,
     height: 1.5,
   );
 
@@ -80,22 +112,7 @@ class AppTextStyles {
     height: 1.5,
   );
 
-  // Navigation
-  static const TextStyle navButton = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    color: AppColor.bodyText,
-    height: 1.4,
-  );
-
-  static const TextStyle navButtonActive = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    color: AppColor.primary,
-    height: 1.4,
-  );
-
-  // Button text — color comes from the button's foregroundColor
+  // Button text
   static const TextStyle button = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w600,
@@ -117,5 +134,13 @@ class AppTextStyles {
     fontStyle: FontStyle.italic,
     color: AppColor.bodyText,
     height: 1.5,
+  );
+
+  // Caption styles
+  static const TextStyle caption = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: AppColor.bodyText,
+    letterSpacing: 0.5,
   );
 }
