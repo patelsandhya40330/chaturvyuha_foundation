@@ -1,0 +1,3 @@
+import 'package:flutter/material.dart';
+import '../../../widgets/forms/admin_form_section.dart';
+class ArticleSeoSection extends StatelessWidget{const ArticleSeoSection({super.key});@override Widget build(BuildContext c)=>const AdminFormSection(title:'SEO Settings',subtitle:'Optional metadata for search engines.',child:Column(children:[AdminTextField(label:'Meta title',hint:'Enter SEO title'),SizedBox(height:14),AdminTextField(label:'Meta description',hint:'Write a short search description',maxLines:3),SizedBox(height:14),AdminTextField(label:'Keywords',hint:'culture, heritage, education')]));}
