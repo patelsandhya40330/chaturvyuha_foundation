@@ -17,7 +17,7 @@ import '../Events/events_screen.dart';
 class _DashboardLayout {
   static const tablet = 600.0;
   static const desktop = 1100.0;
-  static const logoSize = 50.0;
+  static const logoSize = 60.0;
   static const logoAsset = 'assets/chaturvedal-logo.png';
   static const memberIndex = 8;
 }
@@ -117,7 +117,7 @@ class _DashboardHeader extends StatelessWidget {
           return Material(
             color: AppColor.backgroundColor,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
               child: Row(
                 children: [
                   Expanded(child: brand),
@@ -154,7 +154,7 @@ class _DashboardHeader extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: width >= 1400 ? 60 : 24,
-              vertical: 16,
+              vertical: 24,
             ),
             child: Row(
               children: [
@@ -211,7 +211,11 @@ class _Logo extends StatelessWidget {
       fit: BoxFit.contain,
       semanticLabel: 'CHATURVEDA Foundation logo',
       errorBuilder: (context, error, stackTrace) {
-        return Image.asset("assets/chaturvedal-logo.png", scale: 15);
+        return Image.asset(
+          "assets/chaturvedal-logo.png",
+          height: 10,
+          width: 10,
+        );
       },
     );
   }
@@ -366,7 +370,7 @@ class _DrawerBrand extends StatelessWidget {
             ),
             const Center(child: _Logo(size: 60)),
             const SizedBox(height: 12),
-            Image.asset("assets/chaturvedal-logo.png", scale: 15")
+
             const Text(
               'CHATURVEDA',
               textAlign: TextAlign.center,
