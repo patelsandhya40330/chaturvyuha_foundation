@@ -62,7 +62,7 @@ class _AppCardContainerState extends State<AppCardContainer> {
           alignment: widget.alignment,
           clipBehavior: widget.clipBehavior,
           transform: _isHovered
-              ? (Matrix4.identity()..scale(1.02))
+              ? Matrix4.diagonal3Values(1.02, 1.02, 1.0)
               : Matrix4.identity(),
           transformAlignment: Alignment.center,
           decoration: BoxDecoration(

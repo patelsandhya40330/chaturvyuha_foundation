@@ -16,6 +16,129 @@ class DharmaSanskritiScreen extends StatefulWidget {
 }
 
 class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
+  String _selectedCategory = "All Topics";
+
+  final List<String> _categories = [
+    "All Topics",
+    "Philosophy",
+    "Linguistic Arts",
+    "Ritual Sciences",
+    "Indigenous Ethics",
+    "Panchanga Study",
+  ];
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  // Info Dialog Helper
+  void _showInfoDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: AppColor.surface,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 600),
+          child: Padding(
+            padding: const EdgeInsets.all(28.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: AppTextStyles.title.copyWith(fontSize: 20),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      onPressed: () => Navigator.pop(ctx),
+                      tooltip: 'Close',
+                    ),
+                  ],
+                ),
+                const Divider(height: 24),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Text(
+                      content,
+                      style: AppTextStyles.body.copyWith(height: 1.6),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Image Preview Modal
+  void _showImagePreview(String imagePath, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog.fullscreen(
+        backgroundColor: Colors.black.withAlpha(220),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: InteractiveViewer(
+                  minScale: 0.8,
+                  maxScale: 4.0,
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const Icon(
+                      Icons.broken_image,
+                      color: Colors.white,
+                      size: 64,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 16,
+                left: 16,
+                right: 64,
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                  onPressed: () => Navigator.pop(ctx),
+                  tooltip: 'Close Preview',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<FoundationProvider>();
@@ -27,6 +150,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
           final bool isDesktop = constraints.maxWidth >= 1100;
 
           return SingleChildScrollView(
+            controller: _scrollController,
             child: Column(
               children: [
                 // 1. HERO SECTION
@@ -182,6 +306,18 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
           children: [
             Expanded(
               child: TextField(
+                controller: _searchController,
+                onSubmitted: (query) {
+                  if (query.trim().isNotEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Searching archives for "${query.trim()}"...',
+                        ),
+                      ),
+                    );
+                  }
+                },
                 decoration: InputDecoration(
                   hintText:
                       "Search Dharma topics, keywords, lineage references...",
@@ -204,43 +340,51 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
               ),
             ),
             const SizedBox(width: 16),
-            AppButton(text: "Explore", onPressed: () {}, isPrimary: true),
+            AppButton(
+              text: "Explore",
+              onPressed: () {
+                final query = _searchController.text.trim();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      query.isEmpty
+                          ? 'Showing all Dharma & Sanskriti topics'
+                          : 'Filtered topics by "$query"',
+                    ),
+                  ),
+                );
+              },
+              isPrimary: true,
+            ),
           ],
         ),
         const SizedBox(height: 32),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children:
-                [
-                  "All Topics",
-                  "Philosophy",
-                  "Linguistic Arts",
-                  "Ritual Sciences",
-                  "Indigenous Ethics",
-                  "Panchanga Study",
-                ].map((cat) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: ChoiceChip(
-                      label: Text(cat),
-                      selected: cat == "All Topics",
-                      onSelected: (val) {},
-                      selectedColor: AppColor.primary,
-                      backgroundColor: Colors.white,
-                      labelStyle: TextStyle(
-                        color: cat == "All Topics"
-                            ? Colors.white
-                            : Colors.black,
-                        fontSize: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: const BorderSide(color: AppColor.border),
-                      ),
-                    ),
-                  );
-                }).toList(),
+            children: _categories.map((cat) {
+              final bool isSelected = _selectedCategory == cat;
+              return Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: ChoiceChip(
+                  label: Text(cat),
+                  selected: isSelected,
+                  onSelected: (val) {
+                    if (val) setState(() => _selectedCategory = cat);
+                  },
+                  selectedColor: AppColor.primary,
+                  backgroundColor: Colors.white,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : Colors.black,
+                    fontSize: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: const BorderSide(color: AppColor.border),
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -251,6 +395,10 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     return AppCardContainer(
       height: 450,
       borderRadius: 24,
+      onTap: () => _showImagePreview(
+        "assets/image_2.png",
+        "Classical Sanskrit Manuscripts",
+      ),
       image: const DecorationImage(
         image: AssetImage("assets/image_2.png"),
         fit: BoxFit.cover,
@@ -264,7 +412,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withAlpha(100),
+                color: Colors.black.withAlpha(140),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Column(
@@ -299,24 +447,32 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
         "title": "Sanatana Dharma: The Cosmic Blueprint",
         "desc":
             "Understanding the eternal moral laws and duty that govern the universe and individual existence.",
+        "full":
+            "Sanātana Dharma translates to the 'Eternal Law or Duty'. Unlike dogma, it represents the harmonic blueprint underlying all natural cycles, ethics, and cosmic balance. By living in alignment with Ṛta (cosmic order), individuals fulfill their personal duties (Svadharma) while maintaining planetary harmony.",
       },
       {
         "label": "LIFE'S AIMS",
         "title": "Purushartha: Four Sacred Aims",
         "desc":
             "Dharma (Ethics), Artha (Prosperity), Kama (Pleasure), and Moksha (Liberation) as the foundation of a balanced life.",
+        "full":
+            "Puruṣārtha delineates the four canonical aims of human existence:\n\n1. Dharma: Righteousness and moral duty\n2. Artha: Material prosperity and security\n3. Kāma: Sensorial and aesthetic enjoyment\n4. Mokṣa: Ultimate spiritual liberation\n\nWhen Artha and Kama are guided by Dharma, they naturally ripen into Moksha.",
       },
       {
         "label": "SELF-KNOWLEDGE",
         "title": "Svadharma: Individual Nature",
         "desc":
             "Discovering one's unique path and duties aligned with personal temperament and cosmic responsibility.",
+        "full":
+            "Svadharma is one's personal duty dictated by inherent qualities (Guṇas) and stage of life (Āśrama). Following another's path brings internal disharmony, whereas embracing one's Svadharma fosters authentic spiritual evolution and psychological peace.",
       },
       {
         "label": "EVOLUTION",
         "title": "Vidhi-Nishedha: Precepts",
         "desc":
             "Analyzing the traditional guidelines for actions that foster growth and avoid stagnation in consciousness.",
+        "full":
+            "Vidhi represents constructive, life-affirming duties (what ought to be practiced), while Niṣedha represents prohibited, harmful actions (what ought to be avoided). Together, they act as an ethical compass guiding human conduct.",
       },
     ];
 
@@ -355,6 +511,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
                 width: width,
                 padding: const EdgeInsets.all(28),
                 borderRadius: 24,
+                onTap: () => _showInfoDialog(p["title"]!, p["full"]!),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -423,6 +580,10 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     return AppCardContainer(
       height: 500,
       borderRadius: 24,
+      onTap: () => _showImagePreview(
+        "assets/image_3.png",
+        "Indigenous Ecology & Living Traditions",
+      ),
       image: const DecorationImage(
         image: AssetImage("assets/image_3.png"),
         fit: BoxFit.cover,
@@ -501,21 +662,29 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
         "title": "Garbhadhana to Simanta",
         "desc":
             "Prenatal sacraments focused on welcoming the soul with sacred intention and mental clarity.",
+        "full":
+            "Prenatal sacraments (Garbhādhāna, Puṁsavana, Sīmantonnayana) align the parents' consciousness, invoked mantras, and environmental purity to prepare a sacred vessel for the incoming soul.",
       },
       {
         "title": "Jatakarma & Namakarana",
         "desc":
             "Sacraments of birth and naming, establishing the individual's identity and cosmic connection.",
+        "full":
+            "Birth and naming sacraments invoke cosmic alignment, astrological resonance, and family heritage, giving the newborn an auspicious name charged with phonetic energy.",
       },
       {
         "title": "Upanayana & Vidyarambha",
         "desc":
             "Educational transitions marking the start of scriptural study and inner discipline.",
+        "full":
+            "Upanayana signifies 'bringing near' to the Guru and the Veda. The sacred thread (Yajñopavīta) and Gayatri initiation mark the spiritual rebirth into disciplined study.",
       },
       {
         "title": "Vivaha & Vanaprastha",
         "desc":
             "Mature transitions of householder life and the subsequent inward turn towards wisdom.",
+        "full":
+            "Vivāha elevates householder partnership into a shared spiritual Yajna. Vānaprastha marks the gradual transition from worldly obligations to contemplative solitude.",
       },
     ];
 
@@ -554,6 +723,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
                 padding: const EdgeInsets.all(32),
                 borderRadius: 24,
                 backgroundColor: Colors.white,
+                onTap: () => _showInfoDialog(s["title"]!, s["full"]!),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -579,27 +749,81 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
             borderRadius: 16,
             backgroundColor: const Color(0xFFF1E6D9),
             borderColor: null,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Row(
-                  children: [
-                    Icon(Icons.description_outlined, color: AppColor.primary),
-                    SizedBox(width: 16),
-                    Text(
-                      "The Comprehensive Shodasha Samskara Manual",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                AppButton(
-                  text: "Download Guide PDF",
-                  onPressed: () {},
-                  isPrimary: true,
-                  width: 220,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ],
+            child: LayoutBuilder(
+              builder: (context, box) {
+                bool isWide = box.maxWidth > 650;
+                return isWide
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.description_outlined,
+                                color: AppColor.primary,
+                              ),
+                              SizedBox(width: 16),
+                              Text(
+                                "The Comprehensive Shodasha Samskara Manual",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          AppButton(
+                            text: "Download Guide PDF",
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Downloading Shodasha Samskara Guide PDF...',
+                                  ),
+                                ),
+                              );
+                            },
+                            isPrimary: true,
+                            width: 220,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(
+                                Icons.description_outlined,
+                                color: AppColor.primary,
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  "The Comprehensive Shodasha Samskara Manual",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: AppButton(
+                              text: "Download Guide PDF",
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Downloading Shodasha Samskara Guide PDF...',
+                                    ),
+                                  ),
+                                );
+                              },
+                              isPrimary: true,
+                            ),
+                          ),
+                        ],
+                      );
+              },
             ),
           ),
         ],
@@ -645,6 +869,10 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
                 padding: EdgeInsets.zero,
                 borderRadius: 20,
                 clipBehavior: Clip.antiAlias,
+                onTap: () => _showInfoDialog(
+                  cal['event']!,
+                  "Date: ${cal['date']}\n\nSignificance:\n${cal['significance']}\n\nObservance Guidelines:\nFast during tithi alignment, perform dawn prātah saṁdhyā, and participate in collective chanting at the sanctuary hall.",
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

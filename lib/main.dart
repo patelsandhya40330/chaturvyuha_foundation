@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'UserInterface/Dashboard/dashboard_screen.dart';
+import 'UserInterface/Splash/splash_screen.dart';
 import 'dataProvider/foundation_provider.dart';
 import 'dataProvider/yoga_provider.dart';
 import 'dataProvider/article_provider.dart';
@@ -9,6 +9,9 @@ import 'dataProvider/media_provider.dart';
 import 'dataProvider/membership_provider.dart';
 
 void main() {
+  // Ensure Flutter engine bindings are initialized before running runApp
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(
     MultiProvider(
       providers: [
@@ -31,7 +34,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const DashboardScreen(),
+      title: 'Chaturveda Foundation',
+      theme: ThemeData(fontFamily: 'Georgia', useMaterial3: true),
+      home: const SplashScreen(),
     );
   }
 }

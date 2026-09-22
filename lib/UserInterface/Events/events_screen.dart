@@ -17,6 +17,7 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
+  final ScrollController _scrollController = ScrollController();
   String _activeFilter = 'All Programs';
   final List<String> _filters = [
     'All Programs',
@@ -25,6 +26,161 @@ class _EventsScreenState extends State<EventsScreen> {
     'Vedic Education',
     'Online Sanghas',
   ];
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // Image Preview Modal
+  void _showImagePreview(String imagePath, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog.fullscreen(
+        backgroundColor: Colors.black.withAlpha(220),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: InteractiveViewer(
+                  minScale: 0.8,
+                  maxScale: 4.0,
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const Icon(
+                      Icons.broken_image,
+                      color: Colors.white,
+                      size: 64,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 16,
+                left: 16,
+                right: 64,
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                  onPressed: () => Navigator.pop(ctx),
+                  tooltip: 'Close Preview',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Seat Booking Modal
+  void _showSeatBookingDialog(String eventTitle) {
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: AppColor.surface,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Padding(
+            padding: const EdgeInsets.all(28.0),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          "Request Seat Pass",
+                          style: AppTextStyles.title.copyWith(fontSize: 20),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 20),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(eventTitle, style: AppTextStyles.bulletLabel),
+                  const Divider(height: 24),
+                  TextFormField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      hintText: "Full Name *",
+                      filled: true,
+                      fillColor: Color(0xFFF9F6F1),
+                      border: OutlineInputBorder(borderSide: BorderSide.none),
+                    ),
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'Please enter your name'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      hintText: "Email Address *",
+                      filled: true,
+                      fillColor: Color(0xFFF9F6F1),
+                      border: OutlineInputBorder(borderSide: BorderSide.none),
+                    ),
+                    validator: (v) => (v == null || !v.contains('@'))
+                        ? 'Please enter a valid email'
+                        : null,
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: AppButton(
+                      text: "Confirm Seat Pass Request",
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Seat requested for "${nameController.text.trim()}". Details sent to ${emailController.text.trim()}.',
+                              ),
+                              backgroundColor: AppColor.primary,
+                            ),
+                          );
+                        }
+                      },
+                      isPrimary: true,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +193,7 @@ class _EventsScreenState extends State<EventsScreen> {
           final bool isDesktop = constraints.maxWidth >= 1100;
 
           return SingleChildScrollView(
+            controller: _scrollController,
             child: Column(
               children: [
                 // 1. TOP NOTICE BAR
@@ -92,22 +249,28 @@ class _EventsScreenState extends State<EventsScreen> {
             size: 14,
           ),
           const SizedBox(width: 8),
-          const Text(
-            "Next Sanctuary Assembly: Rigveda Chanting Mahayagna commences in 12 days.",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
+          const Expanded(
+            child: Text(
+              "Next Sanctuary Assembly: Rigveda Chanting Mahayagna commences in 12 days.",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           if (isDesktop) ...[
             const SizedBox(width: 24),
-            const Text(
-              "Join from anywhere online →",
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 11,
-                decoration: TextDecoration.underline,
+            InkWell(
+              onTap: () => _showSeatBookingDialog("Rigveda Chanting Mahayagna"),
+              child: const Text(
+                "Join from anywhere online →",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 11,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
           ],
@@ -148,12 +311,15 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   Widget _buildHeroImage() {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("assets/image_1.png"),
-          fit: BoxFit.cover,
-        ),
+    return AppCardContainer(
+      borderRadius: 0,
+      onTap: () => _showImagePreview(
+        "assets/image_1.png",
+        "Sharad Purnima Silent Immersion",
+      ),
+      image: const DecorationImage(
+        image: AssetImage("assets/image_1.png"),
+        fit: BoxFit.cover,
       ),
       child: Container(
         decoration: BoxDecoration(
@@ -165,29 +331,26 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
         padding: const EdgeInsets.all(40),
         alignment: Alignment.bottomLeft,
-        child: Column(
+        child: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionLabel(
-              text: "FEATURED IMMERSION",
-              color: Colors.white70,
-            ),
-            const SizedBox(height: 16),
-            const Text(
+            SectionLabel(text: "FEATURED IMMERSION", color: Colors.white70),
+            SizedBox(height: 16),
+            Text(
               "Sharad Purnima 7-Day Silent\nBrahma Muhurta Immersion",
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 36,
+                fontSize: 32,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Georgia',
                 height: 1.2,
               ),
             ),
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16),
+            Text(
               "A deep contemplative retreat focusing on the internal resonance of the moon cycles and Vedic silence methodologies.",
-              style: TextStyle(color: Colors.white70, fontSize: 15),
+              style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ],
         ),
@@ -231,12 +394,22 @@ class _EventsScreenState extends State<EventsScreen> {
             children: [
               AppButton(
                 text: "Request Booking Seat",
-                onPressed: () {},
+                onPressed: () => _showSeatBookingDialog(
+                  "Sharad Purnima 7-Day Silent Immersion",
+                ),
                 isPrimary: true,
               ),
               const SizedBox(width: 16),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Downloading Sharad Purnima Immersion PDF Guide...',
+                      ),
+                    ),
+                  );
+                },
                 icon: const Icon(
                   Icons.file_download_outlined,
                   color: AppColor.primary,
@@ -328,14 +501,6 @@ class _EventsScreenState extends State<EventsScreen> {
               ),
             ),
           ),
-          if (isDesktop) ...[
-            const SizedBox(width: 24),
-            const Icon(Icons.search, color: AppColor.grey),
-            const SizedBox(width: 24),
-            const Icon(Icons.grid_view, color: AppColor.primary),
-            const SizedBox(width: 16),
-            const Icon(Icons.list, color: AppColor.grey),
-          ],
         ],
       ),
     );
@@ -407,7 +572,7 @@ class _EventsScreenState extends State<EventsScreen> {
                 ),
               ),
               Text(
-                "${ev.date.day}nd Oct, 2024", // Placeholder date format from image
+                "${ev.date.day}th Oct, 2024",
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -441,16 +606,12 @@ class _EventsScreenState extends State<EventsScreen> {
                 color: AppColor.grey,
               ),
               const SizedBox(width: 8),
-              Text(
-                ev.location,
-                style: const TextStyle(fontSize: 12, color: AppColor.grey),
-              ),
-              const Spacer(),
-              const Icon(Icons.person_outline, size: 14, color: AppColor.grey),
-              const SizedBox(width: 8),
-              const Text(
-                "Acharya Shridhar",
-                style: TextStyle(fontSize: 12, color: AppColor.grey),
+              Expanded(
+                child: Text(
+                  ev.location,
+                  style: const TextStyle(fontSize: 12, color: AppColor.grey),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -470,7 +631,7 @@ class _EventsScreenState extends State<EventsScreen> {
               ),
               AppButton(
                 text: "Apply Online",
-                onPressed: () {},
+                onPressed: () => _showSeatBookingDialog(ev.title),
                 isPrimary: false,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -531,7 +692,6 @@ class _EventsScreenState extends State<EventsScreen> {
                 ],
               ),
               const SizedBox(height: 60),
-              // Masonry-like grid
               if (isDesktop)
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -601,6 +761,7 @@ class _EventsScreenState extends State<EventsScreen> {
       padding: EdgeInsets.zero,
       borderRadius: 24,
       clipBehavior: Clip.antiAlias,
+      onTap: () => _showImagePreview(img, title),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -657,7 +818,15 @@ class _EventsScreenState extends State<EventsScreen> {
                 style: AppTextStyles.heading2,
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Loading all historical sanctuary assembly archives...',
+                      ),
+                    ),
+                  );
+                },
                 child: const Text(
                   "View All Records →",
                   style: AppTextStyles.link,
@@ -682,6 +851,15 @@ class _EventsScreenState extends State<EventsScreen> {
                     width: itemWidth,
                     padding: const EdgeInsets.all(32),
                     borderRadius: 24,
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Accessing audio recording & transcript for ${ev['title']}...',
+                          ),
+                        ),
+                      );
+                    },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

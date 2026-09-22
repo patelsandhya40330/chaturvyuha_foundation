@@ -10,6 +10,7 @@ import '../../dataProvider/yoga_provider.dart';
 import '../../dataProvider/foundation_provider.dart';
 import '../../dataProvider/article_provider.dart';
 import '../../models/yoga_program.dart';
+import '../../models/article_item.dart';
 
 class YogaMeditationScreen extends StatefulWidget {
   const YogaMeditationScreen({super.key});
@@ -19,6 +20,7 @@ class YogaMeditationScreen extends StatefulWidget {
 }
 
 class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
+  final ScrollController _scrollController = ScrollController();
   String _activeFilter = 'All Session';
   final List<String> _filters = [
     'All Session',
@@ -27,6 +29,124 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
     'Private Sadhana',
     'Youth Programs',
   ];
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // Scroll smoothly to Timetable
+  void _scrollToTimetable() {
+    _scrollController.animateTo(
+      1100,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  // Info Dialog Helper
+  void _showInfoDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: AppColor.surface,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 600),
+          child: Padding(
+            padding: const EdgeInsets.all(28.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: AppTextStyles.title.copyWith(fontSize: 20),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      onPressed: () => Navigator.pop(ctx),
+                      tooltip: 'Close',
+                    ),
+                  ],
+                ),
+                const Divider(height: 24),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Text(
+                      content,
+                      style: AppTextStyles.body.copyWith(height: 1.6),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Image Preview Modal
+  void _showImagePreview(String imagePath, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog.fullscreen(
+        backgroundColor: Colors.black.withAlpha(220),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: InteractiveViewer(
+                  minScale: 0.8,
+                  maxScale: 4.0,
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const Icon(
+                      Icons.broken_image,
+                      color: Colors.white,
+                      size: 64,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 16,
+                left: 16,
+                right: 64,
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                  onPressed: () => Navigator.pop(ctx),
+                  tooltip: 'Close Preview',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +161,7 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
           final bool isDesktop = constraints.maxWidth >= 1100;
 
           return SingleChildScrollView(
+            controller: _scrollController,
             child: Column(
               children: [
                 // 1. HERO SECTION
@@ -140,12 +261,15 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
           children: [
             AppButton(
               text: "Explore Our Vows",
-              onPressed: () {},
+              onPressed: () => _showInfoDialog(
+                "Our Sacred Vows & Guidelines",
+                "The Sadhana Vows at Chaturveda Foundation bind every practitioner to truthfulness (Satya), non-violence (Ahiṃsā), continuous scriptural reflection (Svādhyāya), and devotion to the eternal source (Iśvarapraṇidhāna). All sessions adhere strictly to classical Patanjali and Hatha treatises without commercial dilution.",
+              ),
               isPrimary: true,
             ),
             const SizedBox(width: 24),
             TextButton.icon(
-              onPressed: () {},
+              onPressed: _scrollToTimetable,
               icon: const Icon(Icons.calendar_today_outlined, size: 18),
               label: const Text("View Sadhana Schedule"),
               style: TextButton.styleFrom(
@@ -164,6 +288,10 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
       height: 400,
       borderRadius: 24,
       borderColor: null,
+      onTap: () => _showImagePreview(
+        "assets/image_3.png",
+        "Dharma of the Soul: Gurukul",
+      ),
       image: const DecorationImage(
         image: AssetImage("assets/image_3.png"),
         fit: BoxFit.cover,
@@ -177,7 +305,7 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withAlpha(100),
+                color: Colors.black.withAlpha(140),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: const Column(
@@ -231,7 +359,15 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
             ),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Connecting to live 5:30 AM Surya Mandapam stream...',
+                  ),
+                ),
+              );
+            },
             child: const Text("Access Stream →", style: AppTextStyles.link),
           ),
         ],
@@ -271,6 +407,10 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
                     width: itemWidth,
                     padding: const EdgeInsets.all(32),
                     borderRadius: 24,
+                    onTap: () => _showInfoDialog(
+                      program.title,
+                      "${program.description}\n\nInstructor: ${program.instructor}\nSchedule: ${program.schedule}\nType: ${program.type == ProgramType.yoga ? 'Yoga' : 'Meditation'}\n\nThis curriculum integrates traditional posture work, prāṇāyāma breath cycles, and phonetic chant meditation. All participants receive digital guides and daily live stream access.",
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -329,6 +469,12 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
 
   // --- 3. DAILY TIMETABLE SECTION ---
   Widget _buildTimetableSection(bool isDesktop, YogaProvider provider) {
+    final filteredTimetable = provider.yogaTimetable.where((item) {
+      if (_activeFilter == 'All Session') return true;
+      return item['mode'].toString().contains(_activeFilter) ||
+          item['tag'].toString().contains(_activeFilter);
+    }).toList();
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
       child: Column(
@@ -347,7 +493,7 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
           if (!isDesktop) ...[const SizedBox(height: 24), _buildFilters()],
           const SizedBox(height: 48),
           Column(
-            children: provider.yogaTimetable.map((item) {
+            children: filteredTimetable.map((item) {
               return AppCardContainer(
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.symmetric(
@@ -420,11 +566,20 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
                           textAlign: TextAlign.right,
                         ),
                       ),
-                    const SizedBox(width: 40),
+                    const SizedBox(width: 20),
                     AppButton(
                       text: "Book",
-                      onPressed: () {},
-                      width: 100,
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Seat requested for "${item['title']}" at ${item['time']}. Check your Seeker Portal for pass.',
+                            ),
+                            backgroundColor: AppColor.primary,
+                          ),
+                        );
+                      },
+                      width: 90,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ],
@@ -504,13 +659,17 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
                         padding: EdgeInsets.zero,
                         borderRadius: 24,
                         clipBehavior: Clip.antiAlias,
+                        onTap: () => _showInfoDialog(
+                          member.name,
+                          "${member.role}\n\n${member.bio}\n\nSpecializes in authentic manuscript commentary and traditional transmission of prāṇāyāma methods.",
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             AspectRatio(
                               aspectRatio: 1.2,
                               child: Image.asset(
-                                "assets/image_2.png", // Placeholder as per provider.teamMembers
+                                "assets/image_2.png",
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -607,6 +766,7 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
                     width: itemWidth,
                     padding: const EdgeInsets.all(32),
                     borderRadius: 24,
+                    onTap: () => _showArticleDialog(article),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -650,6 +810,59 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  void _showArticleDialog(ArticleItem article) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: AppColor.surface,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600, maxHeight: 650),
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      article.category.toUpperCase(),
+                      style: AppTextStyles.bulletLabel,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  article.title,
+                  style: AppTextStyles.heading2.copyWith(fontSize: 22),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "By ${article.author} • ${article.publishedDate.day}/${article.publishedDate.month}/${article.publishedDate.year}",
+                  style: AppTextStyles.caption,
+                ),
+                const Divider(height: 32),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Text(
+                      article.content,
+                      style: AppTextStyles.body.copyWith(height: 1.7),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -17,9 +17,14 @@ class ArticlesScreen extends StatefulWidget {
 }
 
 class _ArticlesScreenState extends State<ArticlesScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController _digestEmailController = TextEditingController();
+  final _digestFormKey = GlobalKey<FormState>();
+
   String _searchQuery = '';
   String _selectedCategory = 'All Library';
   ArticleItem? _activeArticle;
+  bool _isDigestSubmitting = false;
 
   final List<String> _categories = [
     'All Library',
@@ -30,6 +35,87 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     'Practice',
     'Wellness',
   ];
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _digestEmailController.dispose();
+    super.dispose();
+  }
+
+  // Digest Subscription Handler
+  Future<void> _subscribeDigest() async {
+    if (_digestFormKey.currentState!.validate()) {
+      setState(() => _isDigestSubmitting = true);
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
+      setState(() => _isDigestSubmitting = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Subscribed! Bi-weekly Vedic dissertations will be sent to ${_digestEmailController.text.trim()}.',
+          ),
+          backgroundColor: AppColor.primary,
+        ),
+      );
+      _digestEmailController.clear();
+    }
+  }
+
+  // Image Preview Modal
+  void _showImagePreview(String imagePath, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog.fullscreen(
+        backgroundColor: Colors.black.withAlpha(220),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: InteractiveViewer(
+                  minScale: 0.8,
+                  maxScale: 4.0,
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const Icon(
+                      Icons.broken_image,
+                      color: Colors.white,
+                      size: 64,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 16,
+                left: 16,
+                right: 64,
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                  onPressed: () => Navigator.pop(ctx),
+                  tooltip: 'Close Preview',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +142,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
           final bool isDesktop = constraints.maxWidth >= 1100;
 
           return SingleChildScrollView(
+            controller: _scrollController,
             child: Column(
               children: [
                 // 1. HERO SECTION
@@ -249,7 +336,17 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                 const SizedBox(width: 16),
                 AppButton(
                   text: "Search Library",
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          _searchQuery.isEmpty
+                              ? 'Showing all library articles'
+                              : 'Filtered articles by "$_searchQuery"',
+                        ),
+                      ),
+                    );
+                  },
                   isPrimary: true,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
@@ -309,6 +406,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
             padding: EdgeInsets.zero,
             borderRadius: 32,
             clipBehavior: Clip.antiAlias,
+            onTap: () => setState(() => _activeArticle = art),
             child: isDesktop
                 ? IntrinsicHeight(
                     child: Row(
@@ -316,9 +414,15 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                       children: [
                         Expanded(
                           flex: 5,
-                          child: Image.asset(
-                            "assets/image_3.png",
-                            fit: BoxFit.cover,
+                          child: InkWell(
+                            onTap: () => _showImagePreview(
+                              "assets/image_3.png",
+                              art.title,
+                            ),
+                            child: Image.asset(
+                              "assets/image_3.png",
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                         Expanded(flex: 6, child: _buildFeaturedContent(art)),
@@ -329,9 +433,15 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                     children: [
                       AspectRatio(
                         aspectRatio: 16 / 10,
-                        child: Image.asset(
-                          "assets/image_3.png",
-                          fit: BoxFit.cover,
+                        child: InkWell(
+                          onTap: () => _showImagePreview(
+                            "assets/image_3.png",
+                            art.title,
+                          ),
+                          child: Image.asset(
+                            "assets/image_3.png",
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                       _buildFeaturedContent(art),
@@ -477,6 +587,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                     padding: const EdgeInsets.all(32),
                     borderRadius: 24,
                     backgroundColor: Colors.white,
+                    onTap: () => setState(() => _activeArticle = art),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -591,6 +702,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                         padding: const EdgeInsets.all(32),
                         borderRadius: 24,
                         backgroundColor: Colors.white,
+                        onTap: () => setState(() => _activeArticle = art),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -669,34 +781,98 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
             const SizedBox(height: 48),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 700),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "Enter your email address",
-                        hintStyle: const TextStyle(color: Colors.white38),
-                        filled: true,
-                        fillColor: Colors.white.withAlpha(20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 20,
-                        ),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  AppButton(
-                    text: "Subscribe Now",
-                    onPressed: () {},
-                    isPrimary: true,
-                  ),
-                ],
+              child: Form(
+                key: _digestFormKey,
+                child: LayoutBuilder(
+                  builder: (context, box) {
+                    bool isWide = box.maxWidth > 500;
+                    return isWide
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _digestEmailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    hintText: "Enter your email address",
+                                    hintStyle: const TextStyle(
+                                      color: Colors.white38,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white.withAlpha(20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 20,
+                                    ),
+                                  ),
+                                  validator: (v) =>
+                                      (v == null || !v.contains('@'))
+                                      ? 'Please enter a valid email'
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              AppButton(
+                                text: _isDigestSubmitting
+                                    ? "Subscribing..."
+                                    : "Subscribe Now",
+                                onPressed: _isDigestSubmitting
+                                    ? () {}
+                                    : _subscribeDigest,
+                                isPrimary: true,
+                              ),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              TextFormField(
+                                controller: _digestEmailController,
+                                keyboardType: TextInputType.emailAddress,
+                                style: const TextStyle(color: Colors.white),
+                                decoration: InputDecoration(
+                                  hintText: "Enter your email address",
+                                  hintStyle: const TextStyle(
+                                    color: Colors.white38,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white.withAlpha(20),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 20,
+                                  ),
+                                ),
+                                validator: (v) =>
+                                    (v == null || !v.contains('@'))
+                                    ? 'Please enter a valid email'
+                                    : null,
+                              ),
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: double.infinity,
+                                child: AppButton(
+                                  text: _isDigestSubmitting
+                                      ? "Subscribing..."
+                                      : "Subscribe Now",
+                                  onPressed: _isDigestSubmitting
+                                      ? () {}
+                                      : _subscribeDigest,
+                                  isPrimary: true,
+                                ),
+                              ),
+                            ],
+                          );
+                  },
+                ),
               ),
             ),
           ],

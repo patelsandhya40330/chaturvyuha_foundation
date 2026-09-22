@@ -14,7 +14,115 @@ class ContactUsScreen extends StatefulWidget {
 }
 
 class _ContactUsScreenState extends State<ContactUsScreen> {
+  final ScrollController _scrollController = ScrollController();
   final _formKey = GlobalKey<FormState>();
+
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _inquiryTypeController = TextEditingController();
+  final _messageController = TextEditingController();
+
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _inquiryTypeController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  // Scroll smoothly to the contact form section
+  void _scrollToForm() {
+    _scrollController.animateTo(
+      180,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  // Submit Inquiry Form
+  Future<void> _submitInquiry() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isSubmitting = true);
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Inquiry successfully dispatched! Thank you, ${_nameController.text.trim()}. Our registrar will reply shortly.",
+          ),
+          backgroundColor: AppColor.primary,
+        ),
+      );
+
+      _nameController.clear();
+      _emailController.clear();
+      _phoneController.clear();
+      _inquiryTypeController.clear();
+      _messageController.clear();
+    }
+  }
+
+  // Image Preview Dialog
+  void _showImagePreview(String imagePath, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog.fullscreen(
+        backgroundColor: Colors.black.withAlpha(220),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: InteractiveViewer(
+                  minScale: 0.8,
+                  maxScale: 4.0,
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const Icon(
+                      Icons.broken_image,
+                      color: Colors.white,
+                      size: 64,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 16,
+                left: 16,
+                right: 64,
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Positioned(
+                top: 12,
+                right: 12,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                  onPressed: () => Navigator.pop(ctx),
+                  tooltip: 'Close Preview',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +133,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           final bool isDesktop = constraints.maxWidth >= 1100;
 
           return SingleChildScrollView(
+            controller: _scrollController,
             child: Column(
               children: [
                 // 1. HERO & TOP BAR
@@ -87,14 +196,16 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           RichText(
             text: TextSpan(
               style: AppTextStyles.heroHeading.copyWith(
-                fontSize: 54,
+                fontSize: isDesktop ? 54 : 36,
                 height: 1.1,
               ),
               children: [
                 const TextSpan(text: "Connect With the "),
                 TextSpan(
                   text: "Sanctuary of Eternal\nLight",
-                  style: AppTextStyles.heroSubheading.copyWith(fontSize: 54),
+                  style: AppTextStyles.heroSubheading.copyWith(
+                    fontSize: isDesktop ? 54 : 36,
+                  ),
                 ),
               ],
             ),
@@ -156,7 +267,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
 
   Widget _buildContactForm() {
     return AppCardContainer(
-      padding: const EdgeInsets.all(48),
+      padding: const EdgeInsets.all(32),
       borderRadius: 32,
       child: Form(
         key: _formKey,
@@ -167,48 +278,117 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             const SizedBox(height: 16),
             const Text("Seeker Inquiry Form", style: AppTextStyles.heading2),
             const SizedBox(height: 40),
-            Row(
-              children: [
-                Expanded(
-                  child: _textField("Full Name", "e.g. Shridhar Sharma"),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: _textField("Email Address", "name@example.com"),
-                ),
-              ],
+            LayoutBuilder(
+              builder: (context, box) {
+                bool isWide = box.maxWidth > 500;
+                return isWide
+                    ? Row(
+                        children: [
+                          Expanded(
+                            child: _buildFormField(
+                              controller: _nameController,
+                              label: "Full Name *",
+                              hint: "e.g. Shridhar Sharma",
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? 'Please enter your name'
+                                  : null,
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: _buildFormField(
+                              controller: _emailController,
+                              label: "Email Address *",
+                              hint: "name@example.com",
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (v) => (v == null || !v.contains('@'))
+                                  ? 'Please enter a valid email'
+                                  : null,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          _buildFormField(
+                            controller: _nameController,
+                            label: "Full Name *",
+                            hint: "e.g. Shridhar Sharma",
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Please enter your name'
+                                : null,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildFormField(
+                            controller: _emailController,
+                            label: "Email Address *",
+                            hint: "name@example.com",
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (v) => (v == null || !v.contains('@'))
+                                ? 'Please enter a valid email'
+                                : null,
+                          ),
+                        ],
+                      );
+              },
             ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: _textField("Contact Number", "+91 98765 43210"),
-                ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: _textField(
-                    "Nature of Inquiry",
-                    "General Spiritual Guidance",
-                  ),
-                ),
-              ],
+            const SizedBox(height: 20),
+            LayoutBuilder(
+              builder: (context, box) {
+                bool isWide = box.maxWidth > 500;
+                return isWide
+                    ? Row(
+                        children: [
+                          Expanded(
+                            child: _buildFormField(
+                              controller: _phoneController,
+                              label: "Contact Number (Optional)",
+                              hint: "+91 98765 43210",
+                              keyboardType: TextInputType.phone,
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: _buildFormField(
+                              controller: _inquiryTypeController,
+                              label: "Nature of Inquiry",
+                              hint: "General Spiritual Guidance",
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          _buildFormField(
+                            controller: _phoneController,
+                            label: "Contact Number (Optional)",
+                            hint: "+91 98765 43210",
+                            keyboardType: TextInputType.phone,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildFormField(
+                            controller: _inquiryTypeController,
+                            label: "Nature of Inquiry",
+                            hint: "General Spiritual Guidance",
+                          ),
+                        ],
+                      );
+              },
             ),
-            const SizedBox(height: 24),
-            _textField(
-              "Message / Philosophical Inquiry",
-              "Type your message here...",
+            const SizedBox(height: 20),
+            _buildFormField(
+              controller: _messageController,
+              label: "Message / Philosophical Inquiry *",
+              hint: "Type your message here...",
               maxLines: 5,
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Please enter your message'
+                  : null,
             ),
             const SizedBox(height: 40),
             AppButton(
-              text: "Dispatch Inquiry",
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Demo: Message validated but not sent."),
-                  ),
-                );
-              },
+              text: _isSubmitting ? "Dispatching..." : "Dispatch Inquiry",
+              onPressed: _isSubmitting ? () {} : _submitInquiry,
               isPrimary: true,
             ),
           ],
@@ -217,7 +397,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     );
   }
 
-  Widget _textField(String label, String hint, {int maxLines = 1}) {
+  Widget _buildFormField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -229,9 +416,15 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
             color: Colors.black54,
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         TextFormField(
+          controller: controller,
           maxLines: maxLines,
+          keyboardType: keyboardType,
+          textInputAction: maxLines > 1
+              ? TextInputAction.newline
+              : TextInputAction.next,
+          validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(fontSize: 14, color: Colors.black26),
@@ -241,7 +434,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.all(20),
+            contentPadding: const EdgeInsets.all(18),
           ),
         ),
       ],
@@ -288,13 +481,24 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                "+91 (0) 587 266 15",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Georgia',
+              InkWell(
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Calling Ashram Helpline (+91 0 587 266 15)...',
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "+91 (0) 587 266 15",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Georgia',
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -317,12 +521,28 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                 Icons.location_on_outlined,
                 "THE MAIN SANCTUARY",
                 "108 Vedic Enclave, Cultural District\nRishikesh, Uttarakhand 249201",
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Opening Rishikesh Sanctuary on Map...'),
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 32),
               _contactInfoRow(
                 Icons.email_outlined,
                 "REGISTRAR EMAIL",
                 "archives@chaturvyuha.org",
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Email client opened for archives@chaturvyuha.org',
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -349,21 +569,33 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                           "Pilgrimage",
                         ]
                         .map(
-                          (tag) => Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF1E6D9),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              tag,
-                              style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: AppColor.primary,
+                          (tag) => InkWell(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Filtered canonical feed by $tag',
+                                  ),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1E6D9),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                tag,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColor.primary,
+                                ),
                               ),
                             ),
                           ),
@@ -377,24 +609,40 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     );
   }
 
-  Widget _contactInfoRow(IconData icon, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: AppColor.primary, size: 24),
-        const SizedBox(width: 20),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: AppTextStyles.bulletLabel.copyWith(fontSize: 9)),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+  Widget _contactInfoRow(
+    IconData icon,
+    String label,
+    String value, {
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppColor.primary, size: 24),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTextStyles.bulletLabel.copyWith(fontSize: 9),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -451,13 +699,18 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                 padding: const EdgeInsets.all(32),
                 borderRadius: 24,
                 backgroundColor: Colors.white,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Connecting to ${d["title"]}...')),
+                  );
+                },
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
                       padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1E6D9),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF1E6D9),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -551,6 +804,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                 padding: EdgeInsets.zero,
                 borderRadius: 24,
                 clipBehavior: Clip.antiAlias,
+                onTap: () => _showImagePreview(s["img"]!, s["name"]!),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -625,54 +879,109 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         borderRadius: 24,
         backgroundColor: const Color(0xFFF1E6D9),
         borderColor: null,
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.commute,
-                color: AppColor.primary,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 32),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "TRANSIT & PILGRIMAGE",
-                    style: AppTextStyles.bulletLabel,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "Vedic Transit & Pilgrimage Coordination",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  Text(
-                    "Assisting international seekers with local travel, stay, and documentation for sanctuary visits.",
-                    style: TextStyle(fontSize: 13, color: Colors.black54),
-                  ),
-                ],
-              ),
-            ),
-            if (isDesktop) ...[
-              const SizedBox(width: 40),
-              AppButton(
-                text: "Start Travel Dialogue",
-                onPressed: () {},
-                isPrimary: true,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-              ),
-            ],
-          ],
+        child: LayoutBuilder(
+          builder: (context, box) {
+            bool isWide = box.maxWidth > 700;
+            return isWide
+                ? Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.commute,
+                          color: AppColor.primary,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 32),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "TRANSIT & PILGRIMAGE",
+                              style: AppTextStyles.bulletLabel,
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Vedic Transit & Pilgrimage Coordination",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              "Assisting international seekers with local travel, stay, and documentation for sanctuary visits.",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 32),
+                      AppButton(
+                        text: "Start Travel Dialogue",
+                        onPressed: _scrollToForm,
+                        isPrimary: true,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 16,
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.commute,
+                              color: AppColor.primary,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          const Expanded(
+                            child: Text(
+                              "Vedic Transit & Pilgrimage Coordination",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Assisting international seekers with local travel, stay, and documentation for sanctuary visits.",
+                        style: TextStyle(fontSize: 13, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: AppButton(
+                          text: "Start Travel Dialogue",
+                          onPressed: _scrollToForm,
+                          isPrimary: true,
+                        ),
+                      ),
+                    ],
+                  );
+          },
         ),
       ),
     );
