@@ -6,7 +6,7 @@ import 'member/dataProvider/foundation_provider.dart';
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => FoundationProvider(),
+      create: (_) => FoundationProvider(),
       child: const MyApp(),
     ),
   );
@@ -19,7 +19,26 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: DashboardScreen(),
+      title: 'CFoundation Staff Dashboard',
+      theme: AppTheme.lightTheme,
+      initialRoute: AppRouter.articles,
+      onGenerateRoute: AppRouter.generateRoute,
+      home: const DashboardScreen(),
     );
   }
+}
+
+class AppRouter {
+  static const String articles = '/staff/articles';
+
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    return MaterialPageRoute(
+      builder: (_) => const DashboardScreen(),
+      settings: settings,
+    );
+  }
+}
+
+class AppTheme {
+  static ThemeData get lightTheme => ThemeData.light(useMaterial3: true);
 }
