@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chaturvyuha_foundation/member/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/member/utils/app_text_styles.dart';
-import 'package:chaturvyuha_foundation/member/models/course_item.dart';
 
 import '../../dataProvider/foundation_provider.dart';
 

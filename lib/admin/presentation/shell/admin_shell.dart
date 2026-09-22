@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_constants.dart';
-import '../../member/UserInterface/Dashboard/dashboard_screen.dart';
+import 'package:chaturvyuha_foundation/member/UserInterface/Dashboard/dashboard_screen.dart';
 import '../pages/dashboard/dashboard_page.dart';
 import '../pages/placeholder/placeholder_page.dart';
 import '../widgets/sidebar/app_sidebar.dart';

@@ -1,7 +1,7 @@
-import 'package:chaturvyuha_foundation/app/app.dart';
+import 'package:chaturvyuha_foundation/admin/app/app.dart';
 import 'package:chaturvyuha_foundation/member/UserInterface/Dashboard/dashboard_screen.dart';
 import 'package:chaturvyuha_foundation/member/dataProvider/foundation_provider.dart';
-import 'package:chaturvyuha_foundation/presentation/shell/admin_shell.dart';
+import 'package:chaturvyuha_foundation/admin/presentation/shell/admin_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
