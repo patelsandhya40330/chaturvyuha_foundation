@@ -1,25 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'member/UserInterface/Dashboard/dashboard_screen.dart';
+import 'app/app.dart';
 import 'member/dataProvider/foundation_provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     ChangeNotifierProvider(
-      create: (context) => FoundationProvider(),
-      child: const MyApp(),
+      create: (_) => FoundationProvider(),
+      child: const HeritageAdminApp(),
     ),
   );
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: DashboardScreen(),
-    );
-  }
 }

@@ -1,0 +1,3 @@
+import 'package:flutter/material.dart';
+import '../../../widgets/forms/admin_form_section.dart';
+class EventLocationSection extends StatelessWidget{const EventLocationSection({super.key});@override Widget build(BuildContext c)=>const AdminFormSection(title:'Date & Location',child:Column(children:[Row(children:[Expanded(child:AdminTextField(label:'Event Date',hint:'Jun 25, 2025',suffixIcon:Icon(Icons.calendar_today_outlined))),SizedBox(width:12),Expanded(child:AdminTextField(label:'Event Time',hint:'10:00 AM',suffixIcon:Icon(Icons.schedule_outlined)))]),SizedBox(height:14),AdminTextField(label:'Location',hint:'Enter event location',suffixIcon:Icon(Icons.location_on_outlined)),SizedBox(height:14),AdminTextField(label:'Address',hint:'Full address',maxLines:2)]));}
