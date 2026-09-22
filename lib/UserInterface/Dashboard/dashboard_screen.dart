@@ -444,8 +444,17 @@ class _ProfileAvatar extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
+              color: AppColor.surface,
               shape: BoxShape.circle,
               border: Border.all(color: AppColor.border, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColor.primary.withAlpha(45),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: const CircleAvatar(
               radius: 18,
