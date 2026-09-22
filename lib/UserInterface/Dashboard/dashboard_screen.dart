@@ -183,6 +183,8 @@ class _Brand extends StatelessWidget {
         Expanded(
           child: Text(
             'CHATURVEDA\nFoundations',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
             style: AppTextStyles.heading2.copyWith(
               color: AppColor.primary,
               fontSize: desktop ? 18 : 16,
@@ -209,7 +211,7 @@ class _Logo extends StatelessWidget {
       fit: BoxFit.contain,
       semanticLabel: 'CHATURVEDA Foundation logo',
       errorBuilder: (context, error, stackTrace) {
-        return Icon(Icons.spa, size: size, color: AppColor.primary);
+        return Image.asset("assets/chaturvedal-logo.png", scale: 15);
       },
     );
   }
@@ -234,6 +236,8 @@ class _MembershipButton extends StatelessWidget {
       child: const Text(
         'Become a Member',
         textAlign: TextAlign.center,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
       ),
     );
@@ -362,9 +366,12 @@ class _DrawerBrand extends StatelessWidget {
             ),
             const Center(child: _Logo(size: 60)),
             const SizedBox(height: 12),
+            Image.asset("assets/chaturvedal-logo.png", scale: 15")
             const Text(
               'CHATURVEDA',
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 22,
@@ -375,6 +382,8 @@ class _DrawerBrand extends StatelessWidget {
             const Text(
               'Foundations',
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               style: TextStyle(
                 color: Colors.white70,
                 fontSize: 14,

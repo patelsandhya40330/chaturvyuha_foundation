@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'UserInterface/Dashboard/dashboard_screen.dart';
 import 'dataProvider/foundation_provider.dart';
 import 'dataProvider/yoga_provider.dart';
-import 'dataProvider/education_provider.dart';
 import 'dataProvider/article_provider.dart';
 import 'dataProvider/event_provider.dart';
 import 'dataProvider/media_provider.dart';
@@ -15,7 +14,6 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => FoundationProvider()),
         ChangeNotifierProvider(create: (context) => YogaProvider()),
-        ChangeNotifierProvider(create: (context) => EducationProvider()),
         ChangeNotifierProvider(create: (context) => ArticleProvider()),
         ChangeNotifierProvider(create: (context) => EventProvider()),
         ChangeNotifierProvider(create: (context) => MediaProvider()),

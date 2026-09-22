@@ -656,8 +656,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const SizedBox(height: 8),
 
+                          // Foundation Logo
+                          Center(
+                            child: Image.asset(
+                              "assets/chaturvedal-logo.png",
+                              height: 60,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const SizedBox.shrink(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
                           // Top Label
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 8),
                           const Text(
                             "Begin Your Contemplative Journey into the Vedas",
                             style: TextStyle(

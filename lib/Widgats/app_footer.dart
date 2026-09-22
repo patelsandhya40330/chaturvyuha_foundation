@@ -156,26 +156,32 @@ class AppFooter extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Chaturveda Sanctuary",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Georgia',
-                    color: AppColor.heading,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Chaturveda Sanctuary",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Georgia',
+                      color: AppColor.heading,
+                    ),
                   ),
-                ),
-                Text(
-                  "WISDOM • WELLNESS • COMMUNITY",
-                  style: AppTextStyles.bulletLabel.copyWith(
-                    fontSize: 9,
-                    letterSpacing: 1.2,
+                  Text(
+                    "WISDOM • WELLNESS • COMMUNITY",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: AppTextStyles.bulletLabel.copyWith(
+                      fontSize: 9,
+                      letterSpacing: 1.2,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
