@@ -419,6 +419,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          minLines: maxLines > 1 ? 3 : 1,
           maxLines: maxLines,
           keyboardType: keyboardType,
           textInputAction: maxLines > 1

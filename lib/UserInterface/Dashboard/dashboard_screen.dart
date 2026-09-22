@@ -452,7 +452,7 @@ class _ProfileAvatar extends StatelessWidget {
                   color: AppColor.primary.withAlpha(45),
                   blurRadius: 10,
                   spreadRadius: 1,
-                  offset: const Offset(0, 4),
+                  offset: const Offset(10, 10),
                 ),
               ],
             ),
