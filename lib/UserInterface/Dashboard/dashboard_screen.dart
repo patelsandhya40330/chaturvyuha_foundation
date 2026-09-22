@@ -54,8 +54,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _selectPage(int index) {
     if (!mounted) return;
-    // Ignore invalid child callbacks rather than crashing IndexedStack.
-    // Fix the originating callback if this message appears in debug output.
     if (index < 0 || index >= _pages.length) {
       debugPrint('Dashboard: invalid page index $index (expected 0–8).');
       return;
@@ -83,21 +81,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           builder: (context, constraints) {
             return Column(
               children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: constraints.maxHeight * 0.45,
-                  ),
-                  child: SingleChildScrollView(
-                    primary: false,
-                    child: _DashboardHeader(
-                      onMembership: () =>
-                          _selectPage(_DashboardLayout.memberIndex),
-                      onMenu: () => _scaffoldKey.currentState?.openEndDrawer(),
-                    ),
-                  ),
+                _DashboardHeader(
+                  onMembership: () => _selectPage(_DashboardLayout.memberIndex),
+                  onMenu: () => _scaffoldKey.currentState?.openEndDrawer(),
                 ),
-                // Expanded is safe here: the Scaffold bounds this Column.
-                // IndexedStack retains each page's existing state.
                 Expanded(
                   child: IndexedStack(index: _selectedIndex, children: _pages),
                 ),
@@ -123,13 +110,31 @@ class _DashboardHeader extends StatelessWidget {
         final width = constraints.maxWidth;
         final desktop = width >= _DashboardLayout.desktop;
         final mobile = width < _DashboardLayout.tablet;
-        final textScaler = MediaQuery.textScalerOf(context);
-        // Larger accessible text needs more room before using a single row.
-        final extraTextWidth = (textScaler.scale(16) - 16).clamp(0.0, 200.0);
-        final singleRow = width >= 850 + extraTextWidth * 35;
         final brand = _Brand(desktop: desktop);
+
+        // On mobile screens, present a clean single row: Brand on left, Menu icon on right.
+        if (mobile) {
+          return Material(
+            color: AppColor.backgroundColor,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Expanded(child: brand),
+                  IconButton(
+                    tooltip: 'Open Navigation Menu',
+                    icon: const Icon(Icons.menu, size: 28),
+                    onPressed: onMenu,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // On desktop/tablet, display brand on left and action controls on right.
         final controls = Wrap(
-          spacing: mobile ? 4 : 12,
+          spacing: 12,
           runSpacing: 8,
           alignment: WrapAlignment.end,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -147,28 +152,17 @@ class _DashboardHeader extends StatelessWidget {
         return Material(
           color: AppColor.backgroundColor,
           child: Padding(
-            // Change header padding here. Keep the original wide-web inset.
             padding: EdgeInsets.symmetric(
-              horizontal: width >= 1400 ? 60 : (mobile ? 15 : 24),
+              horizontal: width >= 1400 ? 60 : 24,
               vertical: 16,
             ),
-            child: singleRow
-                ? Row(
-                    children: [
-                      Expanded(child: brand),
-                      const SizedBox(width: 24),
-                      Expanded(flex: 2, child: controls),
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      brand,
-                      const SizedBox(height: 12),
-                      // All controls remain available on mobile; they wrap.
-                      controls,
-                    ],
-                  ),
+            child: Row(
+              children: [
+                Expanded(child: brand),
+                const SizedBox(width: 24),
+                Expanded(flex: 2, child: controls),
+              ],
+            ),
           ),
         );
       },
@@ -184,12 +178,11 @@ class _Brand extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const _Logo(size: _DashboardLayout.logoSize, color: AppColor.primary),
+        const _Logo(size: _DashboardLayout.logoSize),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             'CHATURVEDA\nFoundations',
-            // No fixed text height or ellipsis: allow accessible text to wrap.
             style: AppTextStyles.heading2.copyWith(
               color: AppColor.primary,
               fontSize: desktop ? 18 : 16,
@@ -204,27 +197,19 @@ class _Brand extends StatelessWidget {
 }
 
 class _Logo extends StatelessWidget {
-  const _Logo({required this.size, required this.color});
+  const _Logo({required this.size});
   final double size;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    // Bound BOTH dimensions so an image's aspect ratio cannot push out text.
     return Image.asset(
       _DashboardLayout.logoAsset,
       width: size,
       height: size,
       fit: BoxFit.contain,
-      color: color,
       semanticLabel: 'CHATURVEDA Foundation logo',
       errorBuilder: (context, error, stackTrace) {
-        debugPrint("");
-        return SizedBox(
-          width: size,
-          height: size,
-          child: Image.asset(_DashboardLayout.logoAsset, fit: BoxFit.contain)),
-        );
+        return Icon(Icons.spa, size: size, color: AppColor.primary);
       },
     );
   }
@@ -296,8 +281,6 @@ class _DashboardDrawer extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final textHeight = MediaQuery.textScalerOf(context).scale(14);
-            // Keep the membership button sticky when height permits. In short
-            // viewports or with large text, let it scroll with the links.
             final stickyMembership =
                 constraints.maxHeight >= 420 && textHeight <= 21;
             final membership = Padding(
@@ -317,7 +300,6 @@ class _DashboardDrawer extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     children: [
                       _DrawerBrand(onClose: onClose),
-                      // Exactly eight standard destinations; membership is 8.
                       for (var index = 0; index < 8; index++)
                         ListTile(
                           title: Text(_navigationLabel(index)),
@@ -342,7 +324,6 @@ class _DashboardDrawer extends StatelessWidget {
   }
 
   String _navigationLabel(int index) {
-    // Reuse the existing labels; fallbacks avoid an out-of-range label lookup.
     const fallback = [
       'Home',
       'About',
@@ -364,7 +345,6 @@ class _DrawerBrand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Content-sized header avoids DrawerHeader's fixed-height text overflow.
     return ColoredBox(
       color: AppColor.primary,
       child: Padding(
@@ -380,7 +360,7 @@ class _DrawerBrand extends StatelessWidget {
                 icon: const Icon(Icons.close, color: Colors.white),
               ),
             ),
-            const Center(child: _Logo(size: 60, color: Colors.white)),
+            const Center(child: _Logo(size: 60)),
             const SizedBox(height: 12),
             const Text(
               'CHATURVEDA',
@@ -390,6 +370,15 @@ class _DrawerBrand extends StatelessWidget {
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.5,
+              ),
+            ),
+            const Text(
+              'Foundations',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                letterSpacing: 1.2,
               ),
             ),
           ],
