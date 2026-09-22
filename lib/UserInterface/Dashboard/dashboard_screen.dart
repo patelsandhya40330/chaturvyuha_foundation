@@ -206,13 +206,12 @@ class _Logo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       _DashboardLayout.logoAsset,
-      color: AppColor.primary,
       width: size,
       height: size,
       fit: BoxFit.contain,
       semanticLabel: 'CHATURVEDA Foundation logo',
       errorBuilder: (context, error, stackTrace) {
-        return Icon(Icons.error, size: size, color: AppColor.primary);
+        return Icon(Icons.spa, size: size, color: AppColor.primary);
       },
     );
   }
@@ -555,7 +554,16 @@ class _DrawerBrand extends StatelessWidget {
                 icon: const Icon(Icons.close, color: Colors.white),
               ),
             ),
-            const Center(child: _Logo(size: 60)),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: const _Logo(size: 60),
+              ),
+            ),
             const SizedBox(height: 12),
 
             const Text(
