@@ -199,13 +199,15 @@ class _Brand extends StatelessWidget {
 }
 
 class _Logo extends StatelessWidget {
-  const _Logo({required this.size});
+  const _Logo({required this.size, this.color = AppColor.primary});
   final double size;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return Image.asset(
       _DashboardLayout.logoAsset,
+      color: color,
       width: size,
       height: size,
       fit: BoxFit.contain,
@@ -554,16 +556,7 @@ class _DrawerBrand extends StatelessWidget {
                 icon: const Icon(Icons.close, color: Colors.white),
               ),
             ),
-            Center(
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const _Logo(size: 60),
-              ),
-            ),
+            const Center(child: _Logo(size: 60, color: Colors.white)),
             const SizedBox(height: 12),
 
             const Text(

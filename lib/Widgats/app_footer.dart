@@ -144,6 +144,7 @@ class AppFooter extends StatelessWidget {
             // Logo Image replaced as requested
             Image.asset(
               "assets/chaturvedal-logo.png",
+              color: AppColor.primary,
               height: 48,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Container(
