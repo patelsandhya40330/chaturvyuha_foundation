@@ -419,23 +419,25 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          minLines: maxLines > 1 ? 3 : 1,
-          maxLines: maxLines,
-          keyboardType: keyboardType,
-          textInputAction: maxLines > 1
-              ? TextInputAction.newline
-              : TextInputAction.next,
+          minLines: 1,
+          maxLines: 3,
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(fontSize: 14, color: Colors.black26),
             filled: true,
             fillColor: const Color(0xFFF9F6F1),
+            isDense: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.all(18),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 10, // Reduce this for a shorter field.
+            ),
           ),
         ),
       ],
