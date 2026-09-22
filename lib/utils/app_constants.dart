@@ -2,13 +2,12 @@ class AppConstants {
   static const List<String> navigationItems = [
     "Home",
     "About",
-    "Dharma & Sanskriti",
     "Yoga & Meditation",
-    "Education",
+    "Dharma & Sanskriti",
     "Events & Programs",
-    "Knowledge & Articles",
+    "Articles",
     "Media",
-    "Contact Us",
+    "Contact",
     "Become a Member",
   ];
 }

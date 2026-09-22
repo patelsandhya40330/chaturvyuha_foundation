@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/team_member.dart';
 import '../models/event_item.dart';
-import '../models/article_item.dart';
 import '../models/media_item.dart';
-import '../models/course_item.dart';
-import '../models/yoga_program.dart';
 
 class FoundationProvider extends ChangeNotifier {
   // Demo/Sample Data Flag Indicator
@@ -84,67 +81,7 @@ class FoundationProvider extends ChangeNotifier {
     },
   ];
 
-  // 3. Yoga & Meditation Programs Data
-  final List<YogaProgram> yogaPrograms = [
-    YogaProgram(
-      title: "Vedic Hatha Yoga Flow",
-      description:
-          "Align your physical movements with breath control and mantras to build foundational grounding.",
-      instructor: "Dr. Ananya Mishra",
-      schedule: "Mon, Wed, Fri (6:00 AM - 7:30 AM)",
-      type: ProgramType.yoga,
-    ),
-    YogaProgram(
-      title: "Pranayama & Energy Awakening",
-      description:
-          "Deep dive into classical breathing rhythms designed to settle the nervous system.",
-      instructor: "Dr. Ananya Mishra",
-      schedule: "Tue, Thu (6:30 AM - 7:30 AM)",
-      type: ProgramType.yoga,
-    ),
-    YogaProgram(
-      title: "Trataka & Transcendental Stillness",
-      description:
-          "Concentration exercises utilizing candle flames followed by guided internal sound meditation.",
-      instructor: "Swami Vedananda",
-      schedule: "Saturdays (5:00 PM - 6:30 PM)",
-      type: ProgramType.meditation,
-    ),
-  ];
-
-  // 4. Vedic Education Sample Data
-  final List<CourseItem> courses = [
-    CourseItem(
-      title: "Foundations of Upanishadic Wisdom",
-      description:
-          "An intensive introductory look into structural dialogues covering reality, consciousness, and freedom.",
-      duration: "8 Weeks",
-      schedule: "Sundays (8:00 AM - 10:00 AM)",
-      instructor: "Acharya Shridhar Sharma",
-      resources: ["Introduction to Upanishads PDF", "Weekly Audio Chant Guide"],
-      topics: [
-        "Nature of Consciousness",
-        "The Concept of Self",
-        "Karma and Freedom",
-      ],
-    ),
-    CourseItem(
-      title: "Sanskrit Grammar for Beginners",
-      description:
-          "Learn foundational phonetics, declensions, rules of conjugation, and conversational expressions.",
-      duration: "12 Weeks",
-      schedule: "Saturdays (10:00 AM - 12:00 PM)",
-      instructor: "Acharya Shridhar Sharma",
-      resources: ["Sanskrit Primer Workbook", "Audio Pronunciation Dictionary"],
-      topics: [
-        "Sanskrit Vowels & Consonants",
-        "Noun Cases & Inflections",
-        "Simple Sentence Creation",
-      ],
-    ),
-  ];
-
-  // 5. Events & Programs Data
+  // 3. Events & Programs Data
   final List<EventItem> events = [
     EventItem(
       title: "Global Peace Chant Gathering",
@@ -191,47 +128,7 @@ class FoundationProvider extends ChangeNotifier {
     ),
   ];
 
-  // 6. Knowledge / Articles Sample Data
-  final List<ArticleItem> articles = [
-    ArticleItem(
-      id: "art-1",
-      title: "The Role of Mindful Pauses in Modern Routines",
-      excerpt:
-          "How inserting brief moments of quiet reflection can dramatically alleviate workplace stress and clear cognitive overload.",
-      content:
-          "Vedic philosophy teaches that deep, unshakeable peace is not a distant goal, but our intrinsic baseline state. By deliberately structuring short, regular pauses during highly intense daily routines, we decouple our focus from continuous outward stimuli and reconnect with inner stability...",
-      category: "Wellness",
-      tags: ["Mindfulness", "Meditation", "Vedic living"],
-      author: "Dr. Ananya Mishra",
-      publishedDate: DateTime(2024, 1, 10),
-      updatedDate: DateTime(2024, 1, 12),
-      relatedArticleIds: ["art-2"],
-      seoTitle: "Mindful Pauses in Modern Routines | Chaturvyuha Wisdom",
-      seoDescription:
-          "Learn how ancient Vedic mindfulness intervals help resolve modern daily cognitive pressure.",
-      seoKeywords: "mindfulness, stress relief, vedic psychology, self care",
-    ),
-    ArticleItem(
-      id: "art-2",
-      title: "Sanskrit: Sound Vibrations and Brain Plasticity",
-      excerpt:
-          "Exploring modern neuroscientific discoveries validating the benefits of structured vocal chanting.",
-      content:
-          "Chanting sacred Sanskrit verses systematically exercises neural networks, improving overall memory retention and auditory focus. This article highlights recent scientific studies analyzing how precise phonetics shapes neuroplastic development over time...",
-      category: "Language",
-      tags: ["Sanskrit", "Neuroscience", "Chanting"],
-      author: "Acharya Shridhar Sharma",
-      publishedDate: DateTime(2024, 2, 5),
-      updatedDate: DateTime(2024, 2, 5),
-      relatedArticleIds: ["art-1"],
-      seoTitle: "Sanskrit Chanting and Brain Plasticity | Research",
-      seoDescription:
-          "Neuroscientific exploration of vocal vibration benefits on cognitive clarity.",
-      seoKeywords: "sanskrit, chanting, brain health, cognitive plasticity",
-    ),
-  ];
-
-  // 7. Media Sample Data
+  // 4. Media Sample Data
   final List<MediaItem> mediaItems = [
     MediaItem(
       title: "Chanting at Dusk Ceremony",

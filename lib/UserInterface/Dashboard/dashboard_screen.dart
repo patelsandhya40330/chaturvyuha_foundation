@@ -1,19 +1,26 @@
+import 'package:flutter/material.dart';
 import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
 import 'package:chaturvyuha_foundation/utils/app_constants.dart';
-import 'package:flutter/material.dart';
 
-// Import all functional screens
 import '../About/about_screen.dart';
+import '../Articles/articles_screen.dart';
 import '../BecomeMember/become_member_screen.dart';
 import '../ContactUs/contact_us_screen.dart';
 import '../Home/home_screen.dart';
 import '../dharma_sanskriti_screen/dharma_sanskriti_screen.dart';
-import '../Education/education_screen.dart';
 import '../Media/media_screen.dart';
 import '../YogaAndMeditation/yoga_meditation_screen.dart';
 import '../Events/events_screen.dart';
-import '../Knowledge/knowledge_screen.dart';
+
+// Edit shared dashboard dimensions and breakpoints here.
+class _DashboardLayout {
+  static const tablet = 600.0;
+  static const desktop = 1100.0;
+  static const logoSize = 50.0;
+  static const logoAsset = 'assets/chaturvedal-logo.png';
+  static const memberIndex = 8;
+}
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -23,250 +30,238 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  // A key accesses this Scaffold safely from callbacks above its context.
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
-  late List<Widget> _pages;
-
-  final List<String> _navigation = AppConstants.navigationItems;
+  late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
+    // Keep these indices aligned with AppConstants.navigationItems.
     _pages = [
-      HomeScreen(
-        onTabSelected: (index) => setState(() => _selectedIndex = index),
-      ), // 0
-      const AboutScreen(),
-      const DharmaSanskritiScreen(),
-      const YogaMeditationScreen(),
-      const EducationScreen(),
-      const EventsScreen(),
-      const KnowledgeScreen(),
-      const MediaScreen(),
-      const ContactUsScreen(),
-      const BecomeMemberScreen(),
+      HomeScreen(onTabSelected: _selectPage), // 0
+      const AboutScreen(), // 1
+      const YogaMeditationScreen(), // 2
+      const DharmaSanskritiScreen(), // 3
+      const EventsScreen(), // 4
+      const ArticlesScreen(), // 5
+      const MediaScreen(), // 6
+      const ContactUsScreen(), // 7
+      const BecomeMemberScreen(), // 8
     ];
+  }
+
+  void _selectPage(int index) {
+    if (!mounted) return;
+    // Ignore invalid child callbacks rather than crashing IndexedStack.
+    // Fix the originating callback if this message appears in debug output.
+    if (index < 0 || index >= _pages.length) {
+      debugPrint('Dashboard: invalid page index $index (expected 0–8).');
+      return;
+    }
+    if (_selectedIndex != index) {
+      setState(() => _selectedIndex = index);
+    }
+    FocusManager.instance.primaryFocus?.unfocus();
+    _scaffoldKey.currentState?.closeEndDrawer();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Breakpoint matches the wide layout requirement from screenshot
-    final bool isDesktop = MediaQuery.of(context).size.width >= 1300;
-
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColor.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppColor.backgroundColor,
-        scrolledUnderElevation: 0,
-        centerTitle: false,
-        toolbarHeight: 90, // Slightly taller for the branding
-        titleSpacing: isDesktop ? 60 : 15,
-        title: _buildLogoWithText(isDesktop),
-        actions: isDesktop
-            ? [
-                // Navigation items mapped to correct pages
-                _menuButton(text: "Home", index: 0),
-                _menuButton(text: "Dharma &\nSanskriti", index: 2),
-                _menuButton(text: "Yoga &\nMeditation", index: 3),
-                _menuButton(text: "Education", index: 4),
-                _menuButton(text: "Events &\nPrograms", index: 5),
-                _menuButton(text: "Media", index: 7),
-                _menuButton(text: "Contact Us", index: 8),
-
-                _moreMenuButton(),
-
-                const SizedBox(width: 12),
-
-                // Utility Icons
-                IconButton(
-                  tooltip: 'Search',
-                  icon: const Icon(
-                    Icons.search,
-                    color: AppColor.heading,
-                    size: 22,
+      resizeToAvoidBottomInset: true,
+      endDrawer: _DashboardDrawer(
+        selectedIndex: _selectedIndex,
+        onSelected: _selectPage,
+        onClose: () => _scaffoldKey.currentState?.closeEndDrawer(),
+      ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight * 0.45,
                   ),
-                  onPressed: () => ('Search'),
-                ),
-                IconButton(
-                  tooltip: 'Notifications',
-                  icon: const Icon(
-                    Icons.notifications_none,
-                    color: AppColor.heading,
-                    size: 22,
-                  ),
-                  onPressed: () => ('Notifications'),
-                ),
-
-                const SizedBox(width: 16),
-
-                // "Become a Member" Button
-                _membershipButton(index: 9),
-
-                const SizedBox(width: 16),
-
-                // Profile Avatar
-                _profileAvatar(),
-
-                const SizedBox(width: 40),
-              ]
-            : [
-                Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: Builder(
-                    builder: (context) => IconButton(
-                      tooltip: 'Open menu',
-                      icon: const Icon(Icons.menu),
-                      onPressed: () => Scaffold.of(context).openEndDrawer(),
+                  child: SingleChildScrollView(
+                    primary: false,
+                    child: _DashboardHeader(
+                      onMembership: () =>
+                          _selectPage(_DashboardLayout.memberIndex),
+                      onMenu: () => _scaffoldKey.currentState?.openEndDrawer(),
                     ),
                   ),
                 ),
-              ],
-      ),
-      endDrawer: !isDesktop
-          ? Drawer(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  _buildDrawerHeader(),
-                  ...List.generate(
-                    _navigation.length,
-                    ((index) => _sideListTile(
-                      context,
-                      text: _navigation[index],
-                      index: index,
-                    )),
-                  ),
-                  const Divider(),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: _membershipButton(index: 9, isFullWidth: true),
-                  ),
-                ],
-              ),
-            )
-          : null,
-      body: Column(
-        children: [
-          Expanded(
-            child: IndexedStack(index: _selectedIndex, children: _pages),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Branding: Logo + Title + Tagline
-  Widget _buildLogoWithText(bool isDesktop) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Foundation Logo Image
-        Image.asset("assets/chaturvedal-logo.png", height: 50),
-        const SizedBox(width: 12),
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "CHATURVEDA\nFoundations ",
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.heading2.copyWith(
-                  color: AppColor.primary,
-                  fontSize: isDesktop ? 18 : 16, // Smaller font on mobile
-                  letterSpacing: 1.5,
-                  height: 1.1,
+                // Expanded is safe here: the Scaffold bounds this Column.
+                // IndexedStack retains each page's existing state.
+                Expanded(
+                  child: IndexedStack(index: _selectedIndex, children: _pages),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Desktop Nav Button
-  Widget _menuButton({required String text, required int index}) {
-    final bool isSelected = _selectedIndex == index;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: TextButton(
-        onPressed: () => setState(() => _selectedIndex = index),
-        style: TextButton.styleFrom(
-          backgroundColor: isSelected
-              ? AppColor.primary.withAlpha(25)
-              : Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: isSelected
-              ? AppTextStyles.navButtonActive
-              : AppTextStyles.navButton,
+              ],
+            );
+          },
         ),
       ),
     );
   }
+}
 
-  // Dropdown for About/Knowledge
-  Widget _moreMenuButton() {
-    return PopupMenuButton<int>(
-      tooltip: 'More options',
-      onSelected: (index) => setState(() => _selectedIndex = index),
-      itemBuilder: (context) => [
-        const PopupMenuItem(value: 1, child: Text("About Foundation")),
-        const PopupMenuItem(value: 6, child: Text("Knowledge & Articles")),
-      ],
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Row(
+class _DashboardHeader extends StatelessWidget {
+  const _DashboardHeader({required this.onMembership, required this.onMenu});
+
+  final VoidCallback onMembership;
+  final VoidCallback onMenu;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final desktop = width >= _DashboardLayout.desktop;
+        final mobile = width < _DashboardLayout.tablet;
+        final textScaler = MediaQuery.textScalerOf(context);
+        // Larger accessible text needs more room before using a single row.
+        final extraTextWidth = (textScaler.scale(16) - 16).clamp(0.0, 200.0);
+        final singleRow = width >= 850 + extraTextWidth * 35;
+        final brand = _Brand(desktop: desktop);
+        final controls = Wrap(
+          spacing: mobile ? 4 : 12,
+          runSpacing: 8,
+          alignment: WrapAlignment.end,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text("More", style: AppTextStyles.navButton),
-            const Icon(
-              Icons.arrow_drop_down,
-              color: AppColor.heading,
-              size: 18,
+            _MembershipButton(onPressed: onMembership),
+            const _ProfileAvatar(),
+            IconButton(
+              tooltip: 'Open Navigation Menu',
+              icon: const Icon(Icons.menu),
+              onPressed: onMenu,
             ),
           ],
-        ),
-      ),
+        );
+
+        return Material(
+          color: AppColor.backgroundColor,
+          child: Padding(
+            // Change header padding here. Keep the original wide-web inset.
+            padding: EdgeInsets.symmetric(
+              horizontal: width >= 1400 ? 60 : (mobile ? 15 : 24),
+              vertical: 16,
+            ),
+            child: singleRow
+                ? Row(
+                    children: [
+                      Expanded(child: brand),
+                      const SizedBox(width: 24),
+                      Expanded(flex: 2, child: controls),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      brand,
+                      const SizedBox(height: 12),
+                      // All controls remain available on mobile; they wrap.
+                      controls,
+                    ],
+                  ),
+          ),
+        );
+      },
     );
   }
+}
 
-  // Become a Member Styled Button
-  Widget _membershipButton({required int index, bool isFullWidth = false}) {
+class _Brand extends StatelessWidget {
+  const _Brand({required this.desktop});
+  final bool desktop;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const _Logo(size: _DashboardLayout.logoSize, color: AppColor.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            'CHATURVEDA\nFoundations',
+            // No fixed text height or ellipsis: allow accessible text to wrap.
+            style: AppTextStyles.heading2.copyWith(
+              color: AppColor.primary,
+              fontSize: desktop ? 18 : 16,
+              letterSpacing: 1.5,
+              height: 1.1,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Logo extends StatelessWidget {
+  const _Logo({required this.size, required this.color});
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    // Bound BOTH dimensions so an image's aspect ratio cannot push out text.
+    return Image.asset(
+      _DashboardLayout.logoAsset,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      color: color,
+      semanticLabel: 'CHATURVEDA Foundation logo',
+      errorBuilder: (context, error, stackTrace) {
+        debugPrint("");
+        return SizedBox(
+          width: size,
+          height: size,
+          child: Image.asset(_DashboardLayout.logoAsset, fit: BoxFit.contain)),
+        );
+      },
+    );
+  }
+}
+
+class _MembershipButton extends StatelessWidget {
+  const _MembershipButton({required this.onPressed});
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => setState(() => _selectedIndex = index),
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColor.primary,
         foregroundColor: Colors.white,
         elevation: 4,
-        shadowColor: AppColor.primary.withAlpha(102),
+        minimumSize: const Size(48, 48),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
       ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            "Become a Member",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          SizedBox(width: 8),
-          Icon(Icons.arrow_forward, size: 16),
-        ],
+      child: const Text(
+        'Become a Member',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
       ),
     );
   }
+}
 
-  // Profile Avatar
-  Widget _profileAvatar() {
-    return InkWell(
-      onTap: () => ('Profile'),
-      borderRadius: BorderRadius.circular(20),
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'User profile',
       child: Container(
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
@@ -281,75 +276,125 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+}
 
-  // Drawer Header
-  Widget _buildDrawerHeader() {
-    return DrawerHeader(
-      decoration: const BoxDecoration(color: AppColor.primary),
-      padding: EdgeInsets.zero,
-      child: Stack(
-        children: [
-          // Close button (X sign)
-          Positioned(
-            top: 8,
-            right: 8,
-            child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-          // Logo and Text
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+class _DashboardDrawer extends StatelessWidget {
+  const _DashboardDrawer({
+    required this.selectedIndex,
+    required this.onSelected,
+    required this.onClose,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final textHeight = MediaQuery.textScalerOf(context).scale(14);
+            // Keep the membership button sticky when height permits. In short
+            // viewports or with large text, let it scroll with the links.
+            final stickyMembership =
+                constraints.maxHeight >= 420 && textHeight <= 21;
+            final membership = Padding(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: _MembershipButton(
+                  onPressed: () => onSelected(_DashboardLayout.memberIndex),
+                ),
+              ),
+            );
+
+            return Column(
               children: [
-                Image.asset(
-                  "assets/chaturvedal-logo.png",
-                  height: 60,
-                  color: Colors.white,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.spa, color: Colors.white, size: 40),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  "CHATURVEDA",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: [
+                      _DrawerBrand(onClose: onClose),
+                      // Exactly eight standard destinations; membership is 8.
+                      for (var index = 0; index < 8; index++)
+                        ListTile(
+                          title: Text(_navigationLabel(index)),
+                          selected: selectedIndex == index,
+                          selectedColor: AppColor.primary,
+                          onTap: () => onSelected(index),
+                        ),
+                      if (!stickyMembership) ...[
+                        const Divider(height: 1),
+                        membership,
+                      ],
+                    ],
                   ),
                 ),
-                const Text(
-                  "Foundations",
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    letterSpacing: 1.2,
-                  ),
-                ),
+                if (stickyMembership) ...[const Divider(height: 1), membership],
               ],
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }
 
-  // Side List Tile
-  ListTile _sideListTile(
-    BuildContext context, {
-    required String text,
-    required int index,
-  }) {
-    return ListTile(
-      title: Text(text),
-      selected: _selectedIndex == index,
-      selectedColor: AppColor.primary,
-      onTap: () {
-        setState(() => _selectedIndex = index);
-        Navigator.pop(context);
-      },
+  String _navigationLabel(int index) {
+    // Reuse the existing labels; fallbacks avoid an out-of-range label lookup.
+    const fallback = [
+      'Home',
+      'About',
+      'Yoga & Meditation',
+      'Dharma & Sanskriti',
+      'Events',
+      'Articles',
+      'Media',
+      'Contact Us',
+    ];
+    final labels = AppConstants.navigationItems;
+    return index < labels.length ? labels[index] : fallback[index];
+  }
+}
+
+class _DrawerBrand extends StatelessWidget {
+  const _DrawerBrand({required this.onClose});
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    // Content-sized header avoids DrawerHeader's fixed-height text overflow.
+    return ColoredBox(
+      color: AppColor.primary,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                tooltip: 'Close Navigation Menu',
+                onPressed: onClose,
+                icon: const Icon(Icons.close, color: Colors.white),
+              ),
+            ),
+            const Center(child: _Logo(size: 60, color: Colors.white)),
+            const SizedBox(height: 12),
+            const Text(
+              'CHATURVEDA',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -2,6 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
+import 'package:chaturvyuha_foundation/Widgats/section_label.dart';
+import 'package:chaturvyuha_foundation/Widgats/app_footer.dart';
+import 'package:chaturvyuha_foundation/Widgats/app_button.dart';
+
+import '../../Widgats/app_card_container.dart';
 
 class HomeScreen extends StatefulWidget {
   final ValueChanged<int>? onTabSelected;
@@ -14,7 +19,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   final PageController _pageController = PageController();
-  int _currentImageIndex = 0;
   Timer? _timer;
 
   // List of images for the hero slideshow
@@ -27,21 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Auto-scroll the slideshow every 4 seconds
-    _timer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
-      if (_currentImageIndex < _heroImages.length - 1) {
-        _currentImageIndex++;
-      } else {
-        _currentImageIndex = 0;
-      }
-
-      if (_pageController.hasClients) {
-        _pageController.animateToPage(
-          _currentImageIndex,
-          duration: const Duration(milliseconds: 800),
-          curve: Curves.easeInOut,
-        );
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showWelcomePopup();
     });
   }
 
@@ -59,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColor.backgroundColor,
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final bool isDesktop = constraints.maxWidth >= 1000;
+          final bool isDesktop = constraints.maxWidth >= 1100;
           return SingleChildScrollView(
             controller: _scrollController,
             child: Column(
@@ -149,41 +140,27 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 48),
-        Row(
-          children: [
-            _actionButton(
-              text: "Become a Member",
-              onPressed: () => widget.onTabSelected?.call(9),
-              isPrimary: true,
-            ),
-            const SizedBox(width: 20),
-            _actionButton(
-              text: "Explore Pathways",
-              onPressed: () {},
-              isPrimary: false,
-            ),
-          ],
+        AppButton(
+          text: "Become a Member",
+          onPressed: () => widget.onTabSelected?.call(9),
+          isPrimary: true,
         ),
-        const SizedBox(height: 48),
-        _buildSocialProofBar(),
       ],
     );
   }
 
   Widget _buildHeroRightCard() {
-    return Container(
+    return AppCardContainer(
       width: double.infinity,
       height: 450,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9F6F1),
-        borderRadius: BorderRadius.circular(32),
-      ),
+      backgroundColor: const Color(0xFFF9F6F1),
+      borderRadius: 32,
+      borderColor: null,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
         child: PageView.builder(
           controller: _pageController,
           itemCount: _heroImages.length,
-          onPageChanged: (index) => setState(() => _currentImageIndex = index),
           itemBuilder: (context, index) {
             return Image.asset(
               _heroImages[index],
@@ -238,19 +215,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Dharma & Sanskriti",
                   "Philosophy and Language",
                   Icons.menu_book,
-                  2,
+                  4,
                 ),
                 _gatewayCard(
                   "Yoga & Meditation",
                   "Mindfulness and Practice",
                   Icons.self_improvement,
-                  3,
+                  2,
                 ),
                 _gatewayCard(
                   "Vedic Education",
                   "Structured Learning",
                   Icons.school,
-                  4,
+                  3,
                 ),
                 _gatewayCard(
                   "Media & Archives",
@@ -267,13 +244,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _gatewayCard(String title, String desc, IconData icon, int pageIndex) {
-    return Container(
+    return AppCardContainer(
       padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: AppColor.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColor.border),
-      ),
+      borderRadius: 24,
+      onTap: () => widget.onTabSelected?.call(pageIndex),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -291,10 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 12),
           Text(desc, style: AppTextStyles.bodySmall),
           const Spacer(),
-          TextButton(
-            onPressed: () => widget.onTabSelected?.call(pageIndex),
-            child: const Text("Enter Portal →", style: AppTextStyles.link),
-          ),
+          const Text("Enter Portal →", style: AppTextStyles.link),
         ],
       ),
     );
@@ -323,12 +294,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Large practice card with audio mockup
   Widget _buildFeaturedPractice() {
-    return Container(
+    return AppCardContainer(
       padding: const EdgeInsets.all(40),
-      decoration: BoxDecoration(
-        color: AppColor.cardBg,
-        borderRadius: BorderRadius.circular(32),
-      ),
+      borderRadius: 32,
+      backgroundColor: AppColor.cardBg,
+      borderColor: null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -345,12 +315,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 40),
           // Audio mockup container
-          Container(
+          AppCardContainer(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: AppColor.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
+            borderRadius: 20,
+            borderColor: null,
             child: Row(
               children: [
                 const CircleAvatar(
@@ -424,14 +392,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _regimenItem(String title, String desc) {
-    return Container(
+    return AppCardContainer(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColor.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColor.border),
-      ),
+      borderRadius: 16,
       child: Row(
         children: [
           const Icon(
@@ -459,13 +423,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // --- 4. SANSKRIT INTENSIVE BANNER ---
   Widget _buildSanskritBanner(bool isDesktop) {
-    return Container(
+    return AppCardContainer(
       width: double.infinity,
       padding: EdgeInsets.all(isDesktop ? 60 : 32),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2C1B10), // Deep brand brown
-        borderRadius: BorderRadius.circular(32),
-      ),
+      borderRadius: 32,
+      backgroundColor: const Color(0xFF2C1B10), // Deep brand brown
+      borderColor: null,
       child: Column(
         children: [
           _buildSectionLabelWithDot(
@@ -493,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
-          _actionButton(
+          AppButton(
             text: "Apply For Fellowship",
             onPressed: () {},
             isPrimary: true,
@@ -570,12 +533,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _galleryCard(String title, String imagePath) {
-    return Container(
+    return AppCardContainer(
       height: 400,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
-      ),
+      borderRadius: 24,
+      borderColor: null,
+      image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
       child: Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
@@ -607,13 +569,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // --- 6. NEWSLETTER SUBSCRIPTION ---
   Widget _buildNewsletterSection(bool isDesktop) {
-    return Container(
+    return AppCardContainer(
       padding: EdgeInsets.all(isDesktop ? 60 : 32),
-      decoration: BoxDecoration(
-        color: AppColor.white,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: AppColor.border),
-      ),
+      borderRadius: 32,
       child: Column(
         children: [
           _buildSectionLabelWithDot("JOIN THE SEEKER SANGHA"),
@@ -651,11 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                _actionButton(
-                  text: "Subscribe",
-                  onPressed: () {},
-                  isPrimary: true,
-                ),
+                AppButton(text: "Subscribe", onPressed: () {}, isPrimary: true),
               ],
             ),
           ),
@@ -666,246 +620,247 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // --- 7. COMPREHENSIVE FOOTER ---
   Widget _buildFooter(bool isDesktop) {
-    return Container(
-      color: const Color(0xFFF9F6F1), // Slight tint footer background
-      padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 60 : 20,
-        vertical: 80,
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1320),
-          child: Column(
-            children: [
-              if (isDesktop)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 2,
+    return AppFooter(isDesktop: isDesktop);
+  }
+
+  // Section label with a small dot prefix
+  Widget _buildSectionLabelWithDot(String text, {Color? color}) {
+    return SectionLabel(text: text, color: color);
+  }
+
+  void _showWelcomePopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 550),
+            child: AppCardContainer(
+              backgroundColor: const Color(0xFFFCF8F2),
+              borderRadius: 32,
+              borderColor: null,
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Chaturveda Foundations",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: AppColor.primary,
-                            ),
-                          ),
+                          const SizedBox(height: 8),
+
+                          // Top Label
                           const SizedBox(height: 24),
                           const Text(
-                            "Preserving ancient Vedic knowledge and cultural heritage for a harmonious and balanced society.",
-                            style: AppTextStyles.bodySmall,
+                            "Begin Your Contemplative Journey into the Vedas",
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1A1A1A),
+                              fontFamily: 'Georgia',
+                              height: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Preserving 3,000+ years of primordial oral transmission, sacred phonetics, and Vedic wisdom translated for daily mindful living.",
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black.withAlpha(160),
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          _buildPopupItem(
+                            icon: Icons.waves,
+                            title: "Daily Prātah Sādhana",
+                            subtitle:
+                                "Listen to 432Hz consecrated dawn chants & Vedic phonetics.",
+                          ),
+                          const SizedBox(height: 12),
+                          _buildPopupItem(
+                            icon: Icons.auto_stories,
+                            title: "The Four Vedas Guide",
+                            subtitle:
+                                "An introductory handbook to the Samhitas, Brahmanas & Upanishads.",
+                          ),
+                          const SizedBox(height: 12),
+                          _buildPopupItem(
+                            icon: Icons.mail_outline,
+                            title: "Join the Seeker Circle",
+                            subtitle:
+                                "Receive fortnightly Sandhya Patrika & lunar transit contemplations.",
+                          ),
+                          const SizedBox(height: 32),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: "Enter your email address",
+                                    hintStyle: TextStyle(
+                                      color: Colors.black.withAlpha(80),
+                                      fontSize: 14,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      borderSide: BorderSide(
+                                        color: Colors.black.withAlpha(20),
+                                      ),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              AppButton(
+                                text: "Book My Spot",
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 20,
+                                ),
+                                borderRadius: 30,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Explore as Guest • Remind me later",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black.withAlpha(120),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.auto_awesome,
+                                    size: 14,
+                                    color: Color(0xFFD4AF37),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "Free digital handbook included",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black.withAlpha(120),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
+                          const Divider(height: 1),
+                          const SizedBox(height: 20),
+                          Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.spa_outlined,
+                                  size: 16,
+                                  color: Color(0xFF8B5E3C),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  "100% Non-profit spiritual repository • Zero spam, unsubscribe anytime.",
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.black.withAlpha(100),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 60),
-                    _footerColumn("WISDOM WINGS", [
-                      "The Upanishads",
-                      "Daily Rituals",
-                      "Vedic Research",
-                      "Archival Library",
-                    ]),
-                    _footerColumn("SANCTUARY & SEVA", [
-                      "Cultural Calendar",
-                      "Goshala Seva",
-                      "Community Meals",
-                      "Sanctuary Maintenance",
-                    ]),
-                    _footerColumn("PANINI PATHSHALA", [
-                      "Foundation Learning",
-                      "Advanced Grammar",
-                      "Chanting Academy",
-                      "Youth Programs",
-                    ]),
-                  ],
-                )
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Chaturveda Foundations",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppColor.primary,
+                  ),
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.black54),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.black.withAlpha(10),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      "Preserving ancient Vedic knowledge and cultural heritage.",
-                    ),
-                    const SizedBox(height: 48),
-                    _footerColumn("WISDOM WINGS", [
-                      "The Upanishads",
-                      "Daily Rituals",
-                    ]),
-                    _footerColumn("SANCTUARY & SEVA", [
-                      "Cultural Calendar",
-                      "Goshala Seva",
-                    ]),
-                  ],
-                ),
-              const SizedBox(height: 80),
-              const Divider(),
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Expanded(
-                    child: Text(
-                      "© 2024 Chaturveda Foundation. All Rights Reserved.",
-                      style: AppTextStyles.caption,
-                    ),
                   ),
-                  if (isDesktop)
-                    Row(
-                      children: [
-                        const Text(
-                          "Privacy Policy",
-                          style: AppTextStyles.caption,
-                        ),
-                        const SizedBox(width: 24),
-                        const Text(
-                          "Terms of Service",
-                          style: AppTextStyles.caption,
-                        ),
-                      ],
-                    ),
                 ],
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _footerColumn(String title, List<String> links) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            letterSpacing: 1.2,
-          ),
-        ),
-        const SizedBox(height: 24),
-        ...links.map(
-          (link) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Text(link, style: AppTextStyles.bodySmall),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // --- REUSABLE UI HELPERS ---
-
-  // Section label with a small dot prefix
-  Widget _buildSectionLabelWithDot(String text, {Color? color}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: color ?? const Color(0xFFC19A6B),
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
-            color: color ?? const Color(0xFFC19A6B),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Overlapping avatar bar for social proof
-  Widget _buildSocialProofBar() {
-    return Row(
-      children: [
-        for (int i = 0; i < 3; i++)
-          Align(
-            widthFactor: 0.7,
-            child: CircleAvatar(
-              radius: 14,
-              backgroundColor: const Color(0xFFF2EEE7),
-              child: Icon(
-                Icons.person,
-                size: 16,
-                color: AppColor.primary.withAlpha(128),
-              ),
             ),
           ),
-        Container(
-          width: 32,
-          height: 32,
-          decoration: const BoxDecoration(
-            color: AppColor.primary,
-            shape: BoxShape.circle,
-          ),
-          child: const Center(
-            child: Text(
-              "+12k",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        const Expanded(
-          child: Text(
-            "Rooted in tradition, guided by wisdom. Over 12,000+ seekers worldwide.",
-            style: TextStyle(color: AppColor.bodyText, fontSize: 13),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
-  // Primary and secondary action buttons
-  Widget _actionButton({
-    required String text,
-    required VoidCallback onPressed,
-    required bool isPrimary,
+  Widget _buildPopupItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
   }) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isPrimary ? AppColor.primary : const Color(0xFFF2EEE7),
-        foregroundColor: isPrimary ? Colors.white : AppColor.heading,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
+    return AppCardContainer(
+      padding: const EdgeInsets.all(16),
+      borderRadius: 16,
+      backgroundColor: const Color(0xFFF7F2EB).withAlpha(150),
+      borderColor: Colors.black.withAlpha(5),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(width: 12),
-          Icon(
-            isPrimary ? Icons.arrow_forward : Icons.explore_outlined,
-            size: 18,
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1E6D9),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 20, color: const Color(0xFF8B5E3C)),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A1A),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.black.withAlpha(140),
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
