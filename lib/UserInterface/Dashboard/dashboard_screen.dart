@@ -17,7 +17,7 @@ import '../Events/events_screen.dart';
 class _DashboardLayout {
   static const tablet = 600.0;
   static const desktop = 1100.0;
-  static const logoSize = 60.0;
+  static const logoSize = 50.0;
   static const logoAsset = 'assets/chaturvedal-logo.png';
   static const memberIndex = 8;
 }
@@ -117,7 +117,7 @@ class _DashboardHeader extends StatelessWidget {
           return Material(
             color: AppColor.backgroundColor,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   Expanded(child: brand),
@@ -154,7 +154,7 @@ class _DashboardHeader extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: width >= 1400 ? 60 : 24,
-              vertical: 24,
+              vertical: 16,
             ),
             child: Row(
               children: [
@@ -206,16 +206,13 @@ class _Logo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Image.asset(
       _DashboardLayout.logoAsset,
+      color: AppColor.primary,
       width: size,
       height: size,
       fit: BoxFit.contain,
       semanticLabel: 'CHATURVEDA Foundation logo',
       errorBuilder: (context, error, stackTrace) {
-        return Image.asset(
-          "assets/chaturvedal-logo.png",
-          height: 10,
-          width: 10,
-        );
+        return Icon(Icons.error, size: size, color: AppColor.primary);
       },
     );
   }
@@ -251,20 +248,210 @@ class _MembershipButton extends StatelessWidget {
 class _ProfileAvatar extends StatelessWidget {
   const _ProfileAvatar();
 
+  void _showUserInfo(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          backgroundColor: AppColor.surface,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 360),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Top Row with Close Button
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      onPressed: () => Navigator.pop(context),
+                      tooltip: 'Close Profile',
+                    ),
+                  ),
+
+                  // Avatar
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColor.primary, width: 2),
+                    ),
+                    child: const CircleAvatar(
+                      radius: 36,
+                      backgroundColor: AppColor.primary,
+                      child: Icon(Icons.person, color: Colors.white, size: 40),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // User Name
+                  const Text(
+                    'Acharya Seeker',
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.heading,
+                      fontFamily: 'Georgia',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  // Email
+                  Text(
+                    'seeker@chaturvyuha.org',
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColor.bodyText.withAlpha(180),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Membership Tag Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColor.primary.withAlpha(20),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColor.primary.withAlpha(60)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.verified,
+                          size: 16,
+                          color: AppColor.primary,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Sadhaka Member • Active',
+                          style: AppTextStyles.bulletLabel.copyWith(
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  const Divider(),
+                  const SizedBox(height: 12),
+
+                  // Quick Info Rows
+                  _infoRow(Icons.card_membership, 'Member ID', 'CF-2024-8809'),
+                  const SizedBox(height: 8),
+                  _infoRow(Icons.calendar_today, 'Joined', 'January 15, 2024'),
+
+                  const SizedBox(height: 24),
+
+                  // Action Buttons
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Profile settings opened successfully',
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.settings, size: 18),
+                      label: const Text('Account Settings'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColor.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Logged out of Seeker Account'),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.logout,
+                        size: 18,
+                        color: Colors.red,
+                      ),
+                      label: const Text(
+                        'Sign Out',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _infoRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: AppColor.primary),
+        const SizedBox(width: 8),
+        Text(
+          '$label:',
+          style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const Spacer(),
+        Text(value, style: AppTextStyles.bodySmall),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Semantics(
       label: 'User profile',
-      child: Container(
-        padding: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColor.border),
-        ),
-        child: const CircleAvatar(
-          radius: 18,
-          backgroundColor: AppColor.primary,
-          child: Icon(Icons.person, color: Colors.white, size: 20),
+      button: true,
+      child: Tooltip(
+        message: 'View User Profile',
+        child: InkWell(
+          onTap: () => _showUserInfo(context),
+          borderRadius: BorderRadius.circular(30),
+          child: Container(
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColor.border, width: 1.5),
+            ),
+            child: const CircleAvatar(
+              radius: 18,
+              backgroundColor: AppColor.primary,
+              child: Icon(Icons.person, color: Colors.white, size: 20),
+            ),
+          ),
         ),
       ),
     );
