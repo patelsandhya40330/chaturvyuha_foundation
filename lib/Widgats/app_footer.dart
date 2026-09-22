@@ -26,7 +26,7 @@ class AppFooter extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Brand & Logo Column
-                    Expanded(flex: 3, child: _buildBrandColumn()),
+                    Expanded(flex: 3, child: _buildBrandColumn(context)),
                     const SizedBox(width: 48),
                     // Links Column 1: WISDOM WINGS
                     Expanded(
@@ -64,7 +64,7 @@ class AppFooter extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildBrandColumn(),
+                    _buildBrandColumn(context),
                     const SizedBox(height: 40),
                     Wrap(
                       spacing: 32,
@@ -134,14 +134,13 @@ class AppFooter extends StatelessWidget {
     );
   }
 
-  // Brand Column with assets/chaturvedal-logo.png
-  Widget _buildBrandColumn() {
+  // Brand Column with assets/chaturvedal-logo.png and Social Icons
+  Widget _buildBrandColumn(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            // Logo Image replaced as requested
             Image.asset(
               "assets/chaturvedal-logo.png",
               color: AppColor.primary,
@@ -196,6 +195,11 @@ class AppFooter extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
+        // Social Media Icons
+        _buildSocialMediaIcons(context),
+
+        const SizedBox(height: 20),
+
         // Highlight box matching screenshot (PANCHALA DI DEEPA / QUOTE)
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -227,6 +231,58 @@ class AppFooter extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSocialMediaIcons(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "SANCTUARY SOCIAL CHANNELS",
+          style: AppTextStyles.bulletLabel.copyWith(
+            fontSize: 9,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _socialIconButton(context, Icons.facebook, "Facebook"),
+            const SizedBox(width: 10),
+            _socialIconButton(context, Icons.camera_alt_outlined, "Instagram"),
+            const SizedBox(width: 10),
+            _socialIconButton(context, Icons.smart_display_outlined, "YouTube"),
+            const SizedBox(width: 10),
+            _socialIconButton(context, Icons.chat_bubble_outline, "WhatsApp"),
+            const SizedBox(width: 10),
+            _socialIconButton(context, Icons.email_outlined, "Email"),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _socialIconButton(BuildContext context, IconData icon, String label) {
+    return Tooltip(
+      message: 'Follow us on $label',
+      child: InkWell(
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Opening $label official channel...')),
+          );
+        },
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColor.primary.withAlpha(20),
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColor.primary.withAlpha(50)),
+          ),
+          child: Icon(icon, size: 16, color: AppColor.primary),
+        ),
+      ),
     );
   }
 
