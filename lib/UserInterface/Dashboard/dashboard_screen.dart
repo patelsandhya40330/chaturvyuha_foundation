@@ -224,7 +224,7 @@ class _MembershipButton extends StatelessWidget {
         'Become a Member',
         textAlign: TextAlign.center,
         overflow: TextOverflow.ellipsis,
-        maxLines: 1,
+        maxLines: 2,
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
       ),
     );
@@ -488,7 +488,7 @@ class _DashboardDrawer extends StatelessWidget {
                     children: [
                       _DrawerBrand(onClose: onClose),
                       const SizedBox(height: 12),
-                      for (var index = 0; index < 10; index++)
+                      for (var index = 0; index < 9; index++)
                         ListTile(
                           leading: Icon(
                             _navigationIcon(index),
@@ -600,7 +600,6 @@ class _DashboardDrawer extends StatelessWidget {
       Icons.play_circle_outline,
       Icons.bookmark_added_outlined,
       Icons.mail_outline,
-      Icons.card_membership_outlined,
     ];
     return index < icons.length ? icons[index] : Icons.circle_outlined;
   }
@@ -616,7 +615,6 @@ class _DashboardDrawer extends StatelessWidget {
       'Media',
       'My Bookings',
       'Contact Us',
-      'Become a Member',
     ];
     final labels = AppConstants.navigationItems;
     return index < labels.length

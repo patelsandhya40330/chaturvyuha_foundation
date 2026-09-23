@@ -74,33 +74,50 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: AppColor.backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.all(50),
           child: FadeTransition(
             opacity: _fadeAnimation,
             child: ScaleTransition(
               scale: _scaleAnimation,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Spacer(),
 
-                  // Clean circular brand emblem badge without failing image asset
+                  // White circle with the logo tinted in the primary color.
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    height: 120,
+                    width: 120,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColor.white,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColor.primary.withAlpha(30),
+                          color: AppColor.primary.withAlpha(25),
                           blurRadius: 30,
                           spreadRadius: 5,
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.spa,
-                      size: 64,
-                      color: AppColor.primary,
+                    child: ClipOval(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Image.asset(
+                          'assets/chaturvedal-logo.png',
+                          fit: BoxFit.contain,
+                          color: AppColor.primary,
+                          errorBuilder: (context, error, stackTrace) {
+                            debugPrint('Splash logo failed: $error');
+
+                            return const Icon(
+                              Icons.broken_image_outlined,
+                              size: 48,
+                              color: AppColor.primary,
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
