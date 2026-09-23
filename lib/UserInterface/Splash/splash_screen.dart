@@ -87,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen>
                     children: [
                       const Spacer(),
 
-                      // Logo Image
+                      // Logo Image Container
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -108,12 +108,12 @@ class _SplashScreenState extends State<SplashScreen>
                             height: 120,
                             width: 120,
                             fit: BoxFit.contain,
-                            color: AppColor.primary,
                             errorBuilder: (context, error, stackTrace) =>
-                                const Icon(
-                                  Icons.spa,
-                                  size: 80,
-                                  color: AppColor.primary,
+                                Image.asset(
+                                  "assets/chaturvedal-logo.png",
+                                  height: 120,
+                                  width: 120,
+                                  fit: BoxFit.contain,
                                 ),
                           ),
                         ),
