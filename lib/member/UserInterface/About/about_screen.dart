@@ -161,8 +161,7 @@ class AboutScreen extends StatelessWidget {
   }
 
   Widget _buildVisionMission(bool isDesktop) {
-    final visionCard = Expanded(
-      child: Container(
+    final visionCard = Container(
         padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
           color: const Color(0xFFFFF0DC),
@@ -182,11 +181,9 @@ class AboutScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
 
-    final missionCard = Expanded(
-      child: Container(
+    final missionCard = Container(
         padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
           color: const Color(0xFFFFF0DC),
@@ -209,14 +206,17 @@ class AboutScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
 
     if (isDesktop) {
       return IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [visionCard, const SizedBox(width: 24), missionCard],
+          children: [
+            Expanded(child: visionCard),
+            const SizedBox(width: 24),
+            Expanded(child: missionCard),
+          ],
         ),
       );
     }

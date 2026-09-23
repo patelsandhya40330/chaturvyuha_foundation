@@ -1,7 +1,7 @@
-import 'package:cfoundation/core/constants/app_colors.dart';
-import 'package:cfoundation/core/constants/app_sizes.dart';
-import 'package:cfoundation/core/responsive/responsive_layout.dart';
-import 'package:cfoundation/widgets/responsive_grid.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_colors.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_sizes.dart';
+import 'package:chaturvyuha_foundation/staff/core/responsive/responsive_layout.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/responsive_grid.dart';
 import 'package:flutter/material.dart';
 
 class StatItem {

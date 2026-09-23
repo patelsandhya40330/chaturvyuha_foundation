@@ -1,9 +1,9 @@
-import 'package:chaturvyuha_foundation/member/dataProvider/foundation_provider.dart';
+import 'package:chaturvyuha_foundation/staff/member/dataProvider/foundation_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:chaturvyuha_foundation/member/utils/app_colors.dart';
-import 'package:chaturvyuha_foundation/member/utils/app_text_styles.dart';
-import 'package:chaturvyuha_foundation/member/models/team_member.dart';
+import 'package:chaturvyuha_foundation/staff/member/utils/app_colors.dart';
+import 'package:chaturvyuha_foundation/staff/member/utils/app_text_styles.dart';
+import 'package:chaturvyuha_foundation/staff/member/models/team_member.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});

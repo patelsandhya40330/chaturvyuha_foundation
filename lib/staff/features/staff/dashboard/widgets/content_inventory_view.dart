@@ -1,8 +1,8 @@
-import 'package:cfoundation/core/auth/permission_service.dart';
-import 'package:cfoundation/core/constants/app_colors.dart';
-import 'package:cfoundation/core/routing/app_router.dart';
-import 'package:cfoundation/core/utils/ui_utils.dart';
-import 'package:cfoundation/widgets/status_badge.dart';
+import 'package:chaturvyuha_foundation/staff/core/auth/permission_service.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_colors.dart';
+import 'package:chaturvyuha_foundation/staff/core/routing/app_router.dart';
+import 'package:chaturvyuha_foundation/staff/core/utils/ui_utils.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/status_badge.dart';
 import 'package:flutter/material.dart';
 
 class ContentEntry {

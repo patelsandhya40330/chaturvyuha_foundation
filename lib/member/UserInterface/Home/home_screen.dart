@@ -149,14 +149,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 48),
-        Row(
+        Wrap(
+          spacing: 20,
+          runSpacing: 16,
           children: [
             _actionButton(
               text: "Become a Member",
               onPressed: () => widget.onTabSelected?.call(9),
               isPrimary: true,
             ),
-            const SizedBox(width: 20),
             _actionButton(
               text: "Explore Pathways",
               onPressed: () {},
@@ -511,16 +512,18 @@ class _HomeScreenState extends State<HomeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSectionLabelWithDot("VISUAL SANCTUARY"),
-                const SizedBox(height: 16),
-                const Text(
-                  "Living Moments of Sadhana",
-                  style: AppTextStyles.heading2,
-                ),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionLabelWithDot("VISUAL SANCTUARY"),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Living Moments of Sadhana",
+                    style: AppTextStyles.heading2,
+                  ),
+                ],
+              ),
             ),
             if (isDesktop)
               TextButton(
@@ -631,33 +634,30 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 40),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Enter Your Email",
-                      filled: true,
-                      fillColor: AppColor.backgroundColor,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+            child: isDesktop
+                ? Row(
+                    children: [
+                      Expanded(child: _newsletterField()),
+                      const SizedBox(width: 16),
+                      _actionButton(
+                        text: "Subscribe",
+                        onPressed: () {},
+                        isPrimary: true,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _newsletterField(),
+                      const SizedBox(height: 16),
+                      _actionButton(
+                        text: "Subscribe",
+                        onPressed: () {},
+                        isPrimary: true,
                       ),
-                    ),
-                  ),
+                    ],
                 ),
-                const SizedBox(width: 16),
-                _actionButton(
-                  text: "Subscribe",
-                  onPressed: () {},
-                  isPrimary: true,
-                ),
-              ],
-            ),
           ),
         ],
       ),
@@ -884,6 +884,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Primary and secondary action buttons
+  Widget _newsletterField() {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: "Enter Your Email",
+        filled: true,
+        fillColor: AppColor.backgroundColor,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+      ),
+    );
+  }
+
   Widget _actionButton({
     required String text,
     required VoidCallback onPressed,

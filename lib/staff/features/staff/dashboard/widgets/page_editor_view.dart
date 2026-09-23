@@ -1,11 +1,11 @@
-import 'package:cfoundation/core/constants/app_colors.dart';
-import 'package:cfoundation/core/constants/app_sizes.dart';
-import 'package:cfoundation/core/responsive/responsive_layout.dart';
-import 'package:cfoundation/core/utils/ui_utils.dart';
-import 'package:cfoundation/widgets/common/buttons.dart';
-import 'package:cfoundation/widgets/common/dialogs.dart';
-import 'package:cfoundation/widgets/common/navigation_widgets.dart';
-import 'package:cfoundation/widgets/common/state_widgets.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_colors.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_sizes.dart';
+import 'package:chaturvyuha_foundation/staff/core/responsive/responsive_layout.dart';
+import 'package:chaturvyuha_foundation/staff/core/utils/ui_utils.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/common/buttons.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/common/dialogs.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/common/navigation_widgets.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/common/state_widgets.dart';
 import 'package:flutter/material.dart';
 
 enum PageSectionType { hero, text, image, gallery, cta, programEvent }

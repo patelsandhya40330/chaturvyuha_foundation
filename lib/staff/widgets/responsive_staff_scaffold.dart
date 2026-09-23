@@ -1,7 +1,7 @@
-import 'package:cfoundation/core/auth/permission_service.dart';
-import 'package:cfoundation/core/constants/app_colors.dart';
-import 'package:cfoundation/core/constants/app_sizes.dart';
-import 'package:cfoundation/core/responsive/responsive_layout.dart';
+import 'package:chaturvyuha_foundation/staff/core/auth/permission_service.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_colors.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_sizes.dart';
+import 'package:chaturvyuha_foundation/staff/core/responsive/responsive_layout.dart';
 import 'package:flutter/material.dart';
 
 /// Structured navigation model for the dashboard sidebar

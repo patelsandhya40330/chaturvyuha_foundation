@@ -1,7 +1,7 @@
-import 'package:cfoundation/features/auth/presentation/forgot_password_screen.dart';
-import 'package:cfoundation/features/auth/presentation/login_screen.dart';
-import 'package:cfoundation/features/auth/presentation/signup_screen.dart';
-import 'package:cfoundation/features/staff/dashboard/dashboard_screen.dart';
+import 'package:chaturvyuha_foundation/staff/features/auth/presentation/forgot_password_screen.dart';
+import 'package:chaturvyuha_foundation/staff/features/auth/presentation/login_screen.dart';
+import 'package:chaturvyuha_foundation/staff/features/auth/presentation/signup_screen.dart';
+import 'package:chaturvyuha_foundation/staff/features/staff/dashboard/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppRouter {

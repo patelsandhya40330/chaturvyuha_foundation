@@ -1,10 +1,10 @@
-import 'package:cfoundation/core/constants/app_colors.dart';
-import 'package:cfoundation/core/constants/app_sizes.dart';
-import 'package:cfoundation/core/responsive/responsive_layout.dart';
-import 'package:cfoundation/widgets/common/buttons.dart';
-import 'package:cfoundation/widgets/common/form_widgets.dart';
-import 'package:cfoundation/widgets/common/navigation_widgets.dart';
-import 'package:cfoundation/widgets/status_badge.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_colors.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_sizes.dart';
+import 'package:chaturvyuha_foundation/staff/core/responsive/responsive_layout.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/common/buttons.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/common/form_widgets.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/common/navigation_widgets.dart';
+import 'package:chaturvyuha_foundation/staff/widgets/status_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 

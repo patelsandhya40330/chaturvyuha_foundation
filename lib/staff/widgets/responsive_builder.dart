@@ -1,4 +1,4 @@
-import 'package:cfoundation/core/responsive/responsive_layout.dart';
+import 'package:chaturvyuha_foundation/staff/core/responsive/responsive_layout.dart';
 import 'package:flutter/material.dart';
 
 class ResponsiveBuilder extends StatelessWidget {

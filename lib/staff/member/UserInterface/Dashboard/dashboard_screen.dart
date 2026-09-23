@@ -1,6 +1,6 @@
-import 'package:chaturvyuha_foundation/member/utils/app_colors.dart';
-import 'package:chaturvyuha_foundation/member/utils/app_text_styles.dart';
-import 'package:chaturvyuha_foundation/member/utils/app_constants.dart';
+import 'package:chaturvyuha_foundation/staff/member/utils/app_colors.dart';
+import 'package:chaturvyuha_foundation/staff/member/utils/app_text_styles.dart';
+import 'package:chaturvyuha_foundation/staff/member/utils/app_constants.dart';
 import 'package:flutter/material.dart';
 
 // Import all functional screens

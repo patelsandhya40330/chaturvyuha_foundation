@@ -1,4 +1,4 @@
-import 'package:cfoundation/core/constants/app_colors.dart';
+import 'package:chaturvyuha_foundation/staff/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class ConfirmationDialog extends StatelessWidget {
