@@ -83,24 +83,24 @@ class _SplashScreenState extends State<SplashScreen>
                 children: [
                   const Spacer(),
 
-                  // White circle with the logo tinted in the primary color.
+                  // Clean circular brand emblem badge without failing image asset
                   Container(
-                    height: 120,
-                    width: 120,
+                    padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: AppColor.white,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColor.primary.withAlpha(25),
+                          color: AppColor.primary.withAlpha(30),
                           blurRadius: 30,
                           spreadRadius: 5,
                         ),
                       ],
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Icon(Icons.spa, size: 70, color: AppColor.primary),
+                    child: const Icon(
+                      Icons.spa,
+                      size: 64,
+                      color: AppColor.primary,
                     ),
                   ),
                   const SizedBox(height: 32),
