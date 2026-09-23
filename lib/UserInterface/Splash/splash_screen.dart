@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen>
       _startSplashSequence();
     });
 
-    // Setup smooth fade & scale entrance animation for logo
+    // Setup smooth 1,200ms fade & scale entrance animation for logo
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _startSplashSequence() {
-    // Automatically transition to Dashboard after 2.5 seconds
+    // Automatically transition to DashboardScreen after 2,500ms
     _navigationTimer = Timer(const Duration(milliseconds: 2500), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
@@ -88,11 +88,12 @@ class _SplashScreenState extends State<SplashScreen>
                     children: [
                       const Spacer(),
 
-                      // Logo Image Container
+                      // Responsive Logo Container without tight circular clipping
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: AppColor.lightPrimary.withAlpha(120),
+                          borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
                               color: AppColor.primary.withAlpha(25),
@@ -101,21 +102,21 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ],
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child: Image.asset(
-                            "assets/chaturvedal-logo.png",
-                            scale: 15,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              debugPrint('Splash logo failed: $error');
-                              return Image.asset(
-                                "assets/chaturvedal-logo.png",
-                                scale: 15,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          ),
+                        child: Image.asset(
+                          "assets/chaturvedal-logo.png",
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.contain,
+                          semanticLabel: 'CHATURVEDA Foundation logo',
+                          errorBuilder: (context, error, stackTrace) {
+                            debugPrint('Splash logo failed: $error');
+                            // Safe icon fallback rather than attempting to load the failing asset again
+                            return const Icon(
+                              Icons.spa,
+                              size: 80,
+                              color: AppColor.primary,
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(height: 32),

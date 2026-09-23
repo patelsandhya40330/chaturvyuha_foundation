@@ -37,13 +37,6 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
   }
 
   // Scroll smoothly to Timetable
-  void _scrollToTimetable() {
-    _scrollController.animateTo(
-      1100,
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeInOut,
-    );
-  }
 
   // Info Dialog Helper
   void _showInfoDialog(String title, String content) {

@@ -32,7 +32,7 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
   final _signInPasswordController = TextEditingController();
 
   // Selections & state flags
-  int _selectedTierIndex = 1;
+
   String _selectedStream = "Vedic Chanting (Mantra Ganaveda)";
   String _selectedSanctuary = "Rishikesh — Tapovan Ghat Kutir";
   bool _affirmedProtocol = false;

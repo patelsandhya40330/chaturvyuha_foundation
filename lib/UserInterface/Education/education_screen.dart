@@ -8,7 +8,6 @@ import 'package:chaturvyuha_foundation/Widgats/app_footer.dart';
 import 'package:chaturvyuha_foundation/Widgats/app_card_container.dart';
 import '../../dataProvider/foundation_provider.dart';
 import '../../models/article_item.dart';
-import '../../models/course_item.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});

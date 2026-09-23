@@ -736,8 +736,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const SizedBox(height: 8),
 
-                          const SizedBox(height: 16),
-
                           // Top Label
                           const SizedBox(height: 8),
                           const Text(
