@@ -84,25 +84,6 @@ class _EducationScreenState extends State<EducationScreen> {
     );
   }
 
-  Widget _buildBreadcrumbs() {
-    return Row(
-      children: [
-        Text(
-          "Home",
-          style: AppTextStyles.bodySmall.copyWith(color: AppColor.grey),
-        ),
-        const Icon(Icons.chevron_right, size: 14, color: AppColor.grey),
-        Text(
-          "Vedic Education",
-          style: AppTextStyles.bodySmall.copyWith(
-            color: AppColor.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
   // --- 1. HERO SECTION ---
   Widget _buildHeroSection(bool isDesktop) {
     return Padding(
@@ -113,8 +94,6 @@ class _EducationScreenState extends State<EducationScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildBreadcrumbs(),
-          const SizedBox(height: 24),
           const SectionLabel(text: "AUTHENTIC VEDIC EPISTEMOLOGY"),
           const SizedBox(height: 24),
           if (isDesktop)
@@ -123,15 +102,15 @@ class _EducationScreenState extends State<EducationScreen> {
               children: [
                 Expanded(flex: 6, child: _buildHeroLeft()),
                 const SizedBox(width: 60),
-                Expanded(flex: 4, child: _buildHeroRight()),
+                Expanded(flex: 4, child: _buildHeroRight(isDesktop)),
               ],
             )
           else
             Column(
               children: [
                 _buildHeroLeft(),
-                const SizedBox(height: 48),
-                _buildHeroRight(),
+                const SizedBox(height: 24),
+                _buildHeroRight(isDesktop),
               ],
             ),
           const SizedBox(height: 48),
@@ -142,60 +121,85 @@ class _EducationScreenState extends State<EducationScreen> {
   }
 
   Widget _buildHeroLeft() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: const TextSpan(
-            style: AppTextStyles.heroHeading,
-            children: [
-              TextSpan(text: "Sacred Epistemology &\n"),
-              TextSpan(
-                text: "Authentic Vedic Learning.",
-                style: AppTextStyles.heroSubheading,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-        const Text(
-          "Structured lineage academies providing classical models for Sanskrit grammar analysis, sacred philosophy structures, and traditional pedagogy. Our curriculum bridges the ancient oral transmission with modern academic rigor for profound intellectual and spiritual transformation.",
-          style: AppTextStyles.bodyLarge,
-        ),
-        const SizedBox(height: 48),
-        Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final double heroFontSize = screenWidth >= 1100
+            ? 54
+            : (screenWidth < 400 ? 28 : 36);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppButton(
-              text: "Explore Academies",
-              onPressed: () {},
-              isPrimary: true,
-            ),
-            const SizedBox(width: 24),
-            TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.description_outlined, size: 18),
-              label: const Text("Download Prospectus"),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColor.primary,
-                textStyle: AppTextStyles.button,
+            RichText(
+              text: TextSpan(
+                style: AppTextStyles.heroHeading.copyWith(
+                  fontSize: heroFontSize,
+                  height: 1.1,
+                ),
+                children: [
+                  const TextSpan(text: "Sacred Epistemology & "),
+                  TextSpan(
+                    text: "Authentic Vedic Learning.",
+                    style: AppTextStyles.heroSubheading.copyWith(
+                      fontSize: heroFontSize,
+                    ),
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              "Structured lineage academies providing classical models for Sanskrit grammar analysis, sacred philosophy structures, and traditional pedagogy. Our curriculum bridges the ancient oral transmission with modern academic rigor for profound intellectual and spiritual transformation.",
+              style: AppTextStyles.bodyLarge,
+            ),
+            const SizedBox(height: 24),
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                AppButton(
+                  text: "Explore Academies",
+                  onPressed: () {},
+                  isPrimary: true,
+                ),
+                TextButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.description_outlined, size: 18),
+                  label: const Text("Download Prospectus"),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColor.primary,
+                    textStyle: AppTextStyles.button,
+                  ),
+                ),
+              ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 
-  Widget _buildHeroRight() {
+  Widget _buildHeroRight(bool isDesktop) {
     return AppCardContainer(
-      height: 400,
+      height: isDesktop ? 400 : 280,
       borderRadius: 24,
       borderColor: null,
-      image: const DecorationImage(
-        image: AssetImage("assets/image_2.png"),
+      clipBehavior: Clip.antiAlias,
+      padding: EdgeInsets.zero,
+      child: Image.asset(
+        "assets/image_2.png",
         fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: const Color(0xFFE5DED4),
+          child: const Icon(
+            Icons.image_outlined,
+            size: 64,
+            color: AppColor.primary,
+          ),
+        ),
       ),
-      child: const SizedBox.shrink(),
     );
   }
 
@@ -548,11 +552,20 @@ class _EducationScreenState extends State<EducationScreen> {
       height: 450,
       borderRadius: 24,
       borderColor: null,
-      image: const DecorationImage(
-        image: AssetImage("assets/image_3.png"),
+      clipBehavior: Clip.antiAlias,
+      padding: EdgeInsets.zero,
+      child: Image.asset(
+        "assets/image_3.png",
         fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: const Color(0xFFE5DED4),
+          child: const Icon(
+            Icons.image_outlined,
+            size: 64,
+            color: AppColor.primary,
+          ),
+        ),
       ),
-      child: const SizedBox.shrink(),
     );
   }
 

@@ -9,9 +9,9 @@ class AppTextStyles {
     fontSize: 72,
     fontWeight: FontWeight.w800,
     color: AppColor.heading,
-    fontFamily: 'Georgia', // Using a standard serif fallback
-    height: 1.1,
-    letterSpacing: -1.0,
+    fontFamily: 'Georgia',
+    height: 1.2,
+    letterSpacing: -0.5,
   );
 
   // Secondary hero text (italic/serif)
@@ -21,7 +21,7 @@ class AppTextStyles {
     fontStyle: FontStyle.italic,
     color: AppColor.primary,
     fontFamily: 'Georgia',
-    height: 1.2,
+    height: 1.25,
   );
 
   // Legacy heading (used in some screens)
@@ -29,8 +29,8 @@ class AppTextStyles {
     fontSize: 54,
     fontWeight: FontWeight.w700,
     color: AppColor.heading,
-    height: 1.15,
-    letterSpacing: -0.8,
+    height: 1.2,
+    letterSpacing: -0.5,
   );
 
   // Standard headings
@@ -38,7 +38,7 @@ class AppTextStyles {
     fontSize: 32,
     fontWeight: FontWeight.w700,
     color: AppColor.heading,
-    height: 1.2,
+    height: 1.3,
   );
 
   // Smaller section heading
@@ -46,15 +46,15 @@ class AppTextStyles {
     fontSize: 28,
     fontWeight: FontWeight.w600,
     color: AppColor.heading,
-    height: 1.3,
+    height: 1.35,
   );
 
   // Card title
   static const TextStyle title = TextStyle(
-    fontSize: 23,
+    fontSize: 22,
     fontWeight: FontWeight.w600,
     color: AppColor.heading,
-    height: 1.3,
+    height: 1.35,
   );
 
   // Nav buttons - centered, multi-line support
@@ -62,14 +62,14 @@ class AppTextStyles {
     fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColor.heading,
-    height: 1.2,
+    height: 1.3,
   );
 
   static const TextStyle navButtonActive = TextStyle(
     fontSize: 13,
     fontWeight: FontWeight.w700,
     color: AppColor.primary,
-    height: 1.2,
+    height: 1.3,
   );
 
   // Body text
@@ -99,7 +99,7 @@ class AppTextStyles {
     fontSize: 12,
     fontWeight: FontWeight.w700,
     color: AppColor.primary,
-    letterSpacing: 2.0,
+    letterSpacing: 1.5,
     height: 1.5,
   );
 
@@ -108,7 +108,7 @@ class AppTextStyles {
     fontSize: 11,
     fontWeight: FontWeight.w600,
     color: AppColor.primary,
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
     height: 1.5,
   );
 

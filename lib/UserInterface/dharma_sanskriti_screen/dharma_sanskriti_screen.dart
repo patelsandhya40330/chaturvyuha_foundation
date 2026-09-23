@@ -8,6 +8,10 @@ import 'package:chaturvyuha_foundation/Widgats/app_button.dart';
 import '../../Widgats/app_card_container.dart';
 import '../../dataProvider/foundation_provider.dart';
 
+/// A screen displaying the foundational principles of Dharma and living Sanskriti.
+///
+/// Features search and topic filters, Sanatana Dharma principles, indigenous ecological values,
+/// Shodasha Samskaras (16 life sacraments), Vedic Panchanga calendar, and shloka invocations.
 class DharmaSanskritiScreen extends StatefulWidget {
   const DharmaSanskritiScreen({super.key});
 
@@ -15,11 +19,20 @@ class DharmaSanskritiScreen extends StatefulWidget {
   State<DharmaSanskritiScreen> createState() => _DharmaSanskritiScreenState();
 }
 
+/// State implementation for [DharmaSanskritiScreen], managing scroll control,
+/// archive keyword searches, active category topic filter, modal information dialogs,
+/// and image preview overlays.
 class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
+  /// Controller for main page vertical scrolling.
   final ScrollController _scrollController = ScrollController();
+
+  /// Controller for the search text input field.
   final TextEditingController _searchController = TextEditingController();
+
+  /// Currently selected category filter topic (defaults to 'All Topics').
   String _selectedCategory = "All Topics";
 
+  /// Available category filter topics.
   final List<String> _categories = [
     "All Topics",
     "Philosophy",
@@ -36,7 +49,10 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     super.dispose();
   }
 
-  // Info Dialog Helper
+  /// Displays an information dialog modal containing detailed essay content.
+  ///
+  /// [title] The header title of the modal.
+  /// [content] The descriptive body text of the essay or sacrament.
   void _showInfoDialog(String title, String content) {
     showDialog(
       context: context,
@@ -85,7 +101,10 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
-  // Image Preview Modal
+  /// Displays a fullscreen interactive image preview modal.
+  ///
+  /// [imagePath] Path to the asset image.
+  /// [title] Display title for the overlay header.
   void _showImagePreview(String imagePath, String title) {
     showDialog(
       context: context,
@@ -101,11 +120,10 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 64,
-                    ),
+                    errorBuilder: (c, e, s) {
+                      debugPrint('Dharma image preview error: $e');
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ),
               ),
@@ -143,6 +161,17 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<FoundationProvider>();
 
+    final bool showAll = _selectedCategory == "All Topics";
+    final bool showPhilosophy = showAll || _selectedCategory == "Philosophy";
+    final bool showIndigenous =
+        showAll ||
+        _selectedCategory == "Linguistic Arts" ||
+        _selectedCategory == "Indigenous Ethics";
+    final bool showSamskaras =
+        showAll || _selectedCategory == "Ritual Sciences";
+    final bool showPanchanga =
+        showAll || _selectedCategory == "Panchanga Study";
+
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
       body: LayoutBuilder(
@@ -159,28 +188,32 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
                 const SizedBox(height: 100),
 
                 // 2. FOUNDATIONAL PRINCIPLES
-                _buildFoundationalPrinciples(isDesktop, constraints.maxWidth),
-
-                const SizedBox(height: 120),
+                if (showPhilosophy) ...[
+                  _buildFoundationalPrinciples(isDesktop, constraints.maxWidth),
+                  const SizedBox(height: 120),
+                ],
 
                 // 3. INDIGENOUS VALUES & ECOLOGY
-                _buildIndigenousValues(isDesktop),
-
-                const SizedBox(height: 120),
+                if (showIndigenous) ...[
+                  _buildIndigenousValues(isDesktop),
+                  const SizedBox(height: 120),
+                ],
 
                 // 4. SHODASHA SAMSKARAS
-                _buildSamskarasSection(isDesktop, constraints.maxWidth),
-
-                const SizedBox(height: 120),
+                if (showSamskaras) ...[
+                  _buildSamskarasSection(isDesktop, constraints.maxWidth),
+                  const SizedBox(height: 120),
+                ],
 
                 // 5. VEDIC PANCHANGA
-                _buildPanchangaSection(
-                  isDesktop,
-                  constraints.maxWidth,
-                  provider,
-                ),
-
-                const SizedBox(height: 100),
+                if (showPanchanga) ...[
+                  _buildPanchangaSection(
+                    isDesktop,
+                    constraints.maxWidth,
+                    provider,
+                  ),
+                  const SizedBox(height: 100),
+                ],
 
                 // 6. SHLOKA INVOCATION
                 _buildShlokaInvocation(),
@@ -197,7 +230,8 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
-  // --- 1. HERO SECTION ---
+  /// Builds the hero banner section containing breadcrumb navigation,
+  /// main headings, search input, responsive filter chips, and featured manuscript image.
   Widget _buildHeroSection(bool isDesktop) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -258,15 +292,15 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
               children: [
                 Expanded(flex: 6, child: _buildHeroContent()),
                 const SizedBox(width: 60),
-                Expanded(flex: 4, child: _buildHeroImage()),
+                Expanded(flex: 4, child: _buildHeroImage(isDesktop)),
               ],
             )
           else
             Column(
               children: [
                 _buildHeroContent(),
-                const SizedBox(height: 48),
-                _buildHeroImage(),
+                const SizedBox(height: 24),
+                _buildHeroImage(isDesktop),
               ],
             ),
         ],
@@ -274,92 +308,133 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
+  /// Builds the text and controls column inside the hero section, including search bar and responsive category chips.
   Widget _buildHeroContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SectionLabel(text: "ANCIENT WISDOM & HERITAGE"),
-        const SizedBox(height: 24),
-        RichText(
-          text: TextSpan(
-            style: AppTextStyles.heroHeading.copyWith(
-              fontSize: 54,
-              height: 1.1,
-            ),
-            children: [
-              const TextSpan(text: "Preserving Eternal "),
-              TextSpan(
-                text: "Dharma",
-                style: AppTextStyles.heroSubheading.copyWith(fontSize: 54),
-              ),
-              const TextSpan(text: "\n& Living Sanskriti"),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-        const Text(
-          "An exploration of the core ethical frameworks, linguistic structures, and cultural rituals that define the Vedic way of life. Our mission is to bridge primordial wisdom with modern living for a balanced human experience.",
-          style: AppTextStyles.bodyLarge,
-        ),
-        const SizedBox(height: 48),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            // Adaptive search bar layout for narrow mobile screens.
-            if (constraints.maxWidth < 600) {
-              return Column(
-                children: [
-                  _searchField(),
-                  const SizedBox(height: 16),
-                  SizedBox(width: double.infinity, child: _searchButton()),
-                ],
-              );
-            }
-            return Row(
-              children: [
-                Expanded(child: _searchField()),
-                const SizedBox(width: 16),
-                _searchButton(),
-              ],
-            );
-          },
-        ),
-        const SizedBox(height: 32),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: _categories.map((cat) {
-              final bool isSelected = _selectedCategory == cat;
-              return Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: ChoiceChip(
-                  label: Text(cat),
-                  selected: isSelected,
-                  onSelected: (val) {
-                    if (val) setState(() => _selectedCategory = cat);
-                  },
-                  selectedColor: AppColor.primary,
-                  backgroundColor: Colors.white,
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
-                    fontSize: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: const BorderSide(color: AppColor.border),
-                  ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final double heroFontSize = screenWidth >= 1100
+            ? 54
+            : (screenWidth < 400 ? 28 : 36);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SectionLabel(text: "ANCIENT WISDOM & HERITAGE"),
+            const SizedBox(height: 24),
+            RichText(
+              text: TextSpan(
+                style: AppTextStyles.heroHeading.copyWith(
+                  fontSize: heroFontSize,
+                  height: 1.1,
                 ),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
+                children: [
+                  const TextSpan(text: "Preserving Eternal "),
+                  TextSpan(
+                    text: "Dharma ",
+                    style: AppTextStyles.heroSubheading.copyWith(
+                      fontSize: heroFontSize,
+                    ),
+                  ),
+                  const TextSpan(text: "& Living Sanskriti"),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              "An exploration of the core ethical frameworks, linguistic structures, and cultural rituals that define the Vedic way of life. Our mission is to bridge primordial wisdom with modern living for a balanced human experience.",
+              style: AppTextStyles.bodyLarge,
+            ),
+            const SizedBox(height: 48),
+            LayoutBuilder(
+              builder: (context, searchConstraints) {
+                // Adaptive search bar layout for narrow mobile screens.
+                if (searchConstraints.maxWidth < 600) {
+                  return Column(
+                    children: [
+                      _searchField(),
+                      const SizedBox(height: 16),
+                      SizedBox(width: double.infinity, child: _searchButton()),
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    Expanded(child: _searchField()),
+                    const SizedBox(width: 16),
+                    _searchButton(),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 32),
+            LayoutBuilder(
+              builder: (context, boxConstraints) {
+                final categoryChips = _categories.map((cat) {
+                  final bool isSelected = _selectedCategory == cat;
+                  return ChoiceChip(
+                    label: Text(cat),
+                    selected: isSelected,
+                    onSelected: (val) {
+                      if (val) setState(() => _selectedCategory = cat);
+                    },
+                    selectedColor: AppColor.primary,
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    labelStyle: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black87,
+                      fontSize: 12,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: isSelected ? AppColor.primary : AppColor.border,
+                      ),
+                    ),
+                  );
+                }).toList();
+
+                if (boxConstraints.maxWidth >= 768) {
+                  return Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: categoryChips,
+                  );
+                } else {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: categoryChips
+                          .map(
+                            (chip) => Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: chip,
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
-  // Common search field widget for responsive layout consistency.
+  /// Returns the text field widget for searching Dharma & Sanskriti topics.
   Widget _searchField() {
     return TextField(
       controller: _searchController,
+      onChanged: (val) => setState(() {}),
       onSubmitted: (query) {
         if (query.trim().isNotEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -390,7 +465,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
-  // Unified explore button widget for responsive switching.
+  /// Returns the primary search action button widget.
   Widget _searchButton() {
     return AppButton(
       text: "Explore",
@@ -410,20 +485,32 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
-  Widget _buildHeroImage() {
+  /// Builds the manuscript image preview card in the hero section.
+  Widget _buildHeroImage([bool isDesktop = true]) {
     return AppCardContainer(
-      height: 450,
+      height: isDesktop ? 450 : 280,
       borderRadius: 24,
+      clipBehavior: Clip.antiAlias,
+      padding: EdgeInsets.zero,
       onTap: () => _showImagePreview(
         "assets/image_2.png",
         "Classical Sanskrit Manuscripts",
       ),
-      image: const DecorationImage(
-        image: AssetImage("assets/image_2.png"),
-        fit: BoxFit.cover,
-      ),
       child: Stack(
+        fit: StackFit.expand,
         children: [
+          Image.asset(
+            "assets/image_2.png",
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: const Color(0xFFE5DED4),
+              child: const Icon(
+                Icons.image_outlined,
+                size: 64,
+                color: AppColor.primary,
+              ),
+            ),
+          ),
           Positioned(
             bottom: 24,
             left: 24,
@@ -458,7 +545,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
-  // --- 2. FOUNDATIONAL PRINCIPLES ---
+  /// Builds the "Dharma Tattvas" section showcasing foundational philosophical principles in a responsive card grid.
   Widget _buildFoundationalPrinciples(bool isDesktop, double maxWidth) {
     final principles = [
       {
@@ -504,7 +591,11 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
           const SizedBox(height: 24),
           RichText(
             text: TextSpan(
-              style: AppTextStyles.heading2.copyWith(fontSize: 36),
+              style: AppTextStyles.heading2.copyWith(
+                fontSize: isDesktop
+                    ? 36
+                    : (MediaQuery.of(context).size.width < 400 ? 24 : 28),
+              ),
               children: [
                 const TextSpan(text: "Foundational Principles of "),
                 TextSpan(
@@ -525,7 +616,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
             children: principles.map((p) {
               double width = isDesktop
                   ? (maxWidth - 120 - 72) / 4
-                  : (maxWidth - 40 - 24) / 2;
+                  : (maxWidth > 600 ? (maxWidth - 40 - 24) / 2 : maxWidth - 40);
               return AppCardContainer(
                 width: width,
                 padding: const EdgeInsets.all(28),
@@ -573,7 +664,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
-  // --- 3. INDIGENOUS VALUES & ECOLOGY ---
+  /// Builds the "Indigenous Values & Ecology" section with features and image presentation.
   Widget _buildIndigenousValues(bool isDesktop) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
@@ -595,22 +686,33 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
+  /// Builds the image card for the indigenous ecology section.
   Widget _buildIndigenousImage() {
     return AppCardContainer(
       height: 500,
       borderRadius: 24,
+      clipBehavior: Clip.antiAlias,
+      padding: EdgeInsets.zero,
       onTap: () => _showImagePreview(
         "assets/image_3.png",
         "Indigenous Ecology & Living Traditions",
       ),
-      image: const DecorationImage(
-        image: AssetImage("assets/image_3.png"),
+      child: Image.asset(
+        "assets/image_3.png",
         fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: const Color(0xFFE5DED4),
+          child: const Icon(
+            Icons.image_outlined,
+            size: 64,
+            color: AppColor.primary,
+          ),
+        ),
       ),
-      child: const SizedBox.shrink(),
     );
   }
 
+  /// Builds the textual feature highlights column for indigenous values and oral traditions.
   Widget _buildIndigenousContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -648,6 +750,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
+  /// Helper builder for individual feature rows (Icon + Title + Description).
   Widget _indigenousFeature(IconData icon, String title, String desc) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -674,7 +777,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
-  // --- 4. SHODASHA SAMSKARAS ---
+  /// Builds the "Shodasha Samskaras" section outlining the 16 lifecycle sacraments.
   Widget _buildSamskarasSection(bool isDesktop, double maxWidth) {
     final samskaras = [
       {
@@ -736,7 +839,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
             children: samskaras.map((s) {
               double width = isDesktop
                   ? (maxWidth - 120 - 72) / 4
-                  : maxWidth - 40;
+                  : (maxWidth > 600 ? (maxWidth - 40 - 24) / 2 : maxWidth - 40);
               return AppCardContainer(
                 width: width,
                 padding: const EdgeInsets.all(32),
@@ -850,7 +953,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
-  // --- 5. VEDIC PANCHANGA ---
+  /// Builds the "Vedic Panchanga" section displaying upcoming sacred calendar alignments.
   Widget _buildPanchangaSection(
     bool isDesktop,
     double maxWidth,
@@ -882,7 +985,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
               Color headerColor = headerColors[index % headerColors.length];
               double width = isDesktop
                   ? (maxWidth - 120 - 72) / 4
-                  : (maxWidth - 40 - 24) / 2;
+                  : (maxWidth > 600 ? (maxWidth - 40 - 24) / 2 : maxWidth - 40);
               return AppCardContainer(
                 width: width,
                 padding: EdgeInsets.zero,
@@ -948,7 +1051,7 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
     );
   }
 
-  // --- 6. SHLOKA INVOCATION ---
+  /// Builds the Sanskrit Shloka invocation footer section.
   Widget _buildShlokaInvocation() {
     return Container(
       width: double.infinity,

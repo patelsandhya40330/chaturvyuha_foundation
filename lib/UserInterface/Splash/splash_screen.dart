@@ -1,23 +1,42 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
 import '../Dashboard/dashboard_screen.dart';
 
+/// A splash screen displaying brand identity and entrance animations.
+///
+/// Matches the sanctuary aesthetic of the Chaturvyuha Foundation, featuring
+/// ivory backgrounds, saffron accenting, animated lotus badge, and automatic
+/// fade transition to the target [nextScreen].
 class SplashScreen extends StatefulWidget {
+  /// The target screen to navigate to after the splash sequence completes.
+  /// If null, defaults to [DashboardScreen].
   final Widget? nextScreen;
+
   const SplashScreen({super.key, this.nextScreen});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
+/// State implementation for [SplashScreen], managing entrance fade, scale,
+/// and pulse animations alongside automatic navigation timer.
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
+  /// Controller managing splash entrance animations.
   late final AnimationController _controller;
+
+  /// Fade-in animation for content opacity.
   late final Animation<double> _fadeAnimation;
+
+  /// Scale-up animation for central logo badge.
   late final Animation<double> _scaleAnimation;
+
+  /// Continuous subtle pulse animation for sacred emblem ring.
   late final Animation<double> _pulseAnimation;
 
+  /// Timer managing navigation delay.
   Timer? _navigationTimer;
 
   @override
@@ -32,13 +51,13 @@ class _SplashScreenState extends State<SplashScreen>
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
     _scaleAnimation = Tween<double>(
-      begin: 0.82,
+      begin: 0.85,
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     _pulseAnimation = Tween<double>(
       begin: 1.0,
-      end: 1.08,
+      end: 1.06,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _controller.forward();
@@ -49,6 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
     });
   }
 
+  /// Initiates the timer delay before smoothly navigating to [nextScreen].
   void _startSplashSequence() {
     _navigationTimer = Timer(const Duration(milliseconds: 2800), () {
       if (!mounted) return;
@@ -77,14 +97,17 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColor.backgroundColor,
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF824F1A), // Brand primary warm brown
-              Color(0xFF4A2B0E), // Deep sanctuary dark bronze
+              AppColor.backgroundColor, // Serene Ivory (#FDFBF7)
+              AppColor.cardBg, // Soft Warm Cream (#F7F2EB)
             ],
           ),
         ),
@@ -95,7 +118,10 @@ class _SplashScreenState extends State<SplashScreen>
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 20,
+                    ),
                     child: FadeTransition(
                       opacity: _fadeAnimation,
                       child: ScaleTransition(
@@ -103,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 10),
 
                             // Main Central Emblem & Brand Name Section
                             Column(
@@ -112,119 +138,52 @@ class _SplashScreenState extends State<SplashScreen>
                                 const SizedBox(height: 40),
 
                                 // Animated Concentric Sacred Lotus Badge
-                                AnimatedBuilder(
-                                  animation: _pulseAnimation,
-                                  builder: (context, child) {
-                                    return Transform.scale(
-                                      scale: _pulseAnimation.value,
-                                      child: Container(
-                                        width: 140,
-                                        height: 140,
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: const Color(
-                                              0xFFE5C185,
-                                            ).withAlpha(100),
-                                            width: 2,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withAlpha(60),
-                                              blurRadius: 30,
-                                              offset: const Offset(0, 10),
-                                            ),
-                                            BoxShadow(
-                                              color: const Color(
-                                                0xFFE5C185,
-                                              ).withAlpha(30),
-                                              blurRadius: 40,
-                                              spreadRadius: 5,
-                                            ),
-                                          ],
-                                        ),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.white.withAlpha(20),
-                                            border: Border.all(
-                                              color: Colors.white.withAlpha(40),
-                                            ),
-                                          ),
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.spa,
-                                              size: 68,
-                                              color: Color(0xFFFDFBF7),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                _buildSacredEmblem(),
+
                                 const SizedBox(height: 36),
 
-                                // Foundation Title
-                                const FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    'CHATURVEDA',
-                                    style: TextStyle(
-                                      fontFamily: 'Georgia',
-                                      fontSize: 34,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 4,
-                                      color: Colors.white,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black26,
-                                          blurRadius: 10,
-                                          offset: Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-
-                                // Gold Sub-Label
+                                // Brand Title
                                 const Text(
-                                  'FOUNDATIONS',
+                                  'CHATURVEDA',
+                                  style: TextStyle(
+                                    fontFamily: 'Georgia',
+                                    fontSize: 34,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 4,
+                                    color: AppColor.heading,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 6),
+
+                                // Sub-label Badge
+                                const Text(
+                                  'FOUNDATION',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.bold,
                                     letterSpacing: 6,
-                                    color: Color(0xFFE5C185),
+                                    color: AppColor.primary,
                                   ),
                                 ),
-                                const SizedBox(height: 28),
+                                const SizedBox(height: 24),
 
-                                // Decorative Gold Divider
-                                Container(
-                                  width: 44,
-                                  height: 2,
-                                  decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFFE5C185,
-                                    ).withAlpha(180),
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                ),
-                                const SizedBox(height: 28),
+                                // Decorative Saffron Divider with Center Dot
+                                _buildDecorativeDivider(),
+
+                                const SizedBox(height: 24),
 
                                 // Poetic Tagline
                                 const Text(
-                                  'Ancient Wisdom.\nA Meaningful Life.',
+                                  'Ancient Wisdom.\nLiving Traditions. Harmonious Life.',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontFamily: 'Georgia',
-                                    fontSize: 22,
+                                    fontSize: 20,
                                     height: 1.5,
                                     fontStyle: FontStyle.italic,
-                                    color: Color(0xFFFDFBF7),
+                                    color: AppColor.bodyText,
                                   ),
                                 ),
                               ],
@@ -234,41 +193,55 @@ class _SplashScreenState extends State<SplashScreen>
                             Padding(
                               padding: const EdgeInsets.only(
                                 top: 40,
-                                bottom: 28,
+                                bottom: 20,
                               ),
                               child: Column(
                                 children: [
-                                  // Subtle Circular / Linear Loading Bar
+                                  // Subtle Linear Progress Bar in Brand Saffron
                                   SizedBox(
                                     width: 140,
                                     child: LinearProgressIndicator(
                                       minHeight: 3,
-                                      backgroundColor: Colors.white24,
-                                      color: const Color(0xFFE5C185),
+                                      backgroundColor: AppColor.border,
+                                      color: AppColor.primary,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                   ),
                                   const SizedBox(height: 24),
 
-                                  const Text(
-                                    'WISDOM • WELLNESS • COMMUNITY',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 2.0,
-                                      color: Color(0xFFE5C185),
+                                  // Pill Badge
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColor.lightPrimary,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: AppColor.border,
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      '• ETERNAL DHARMA • VEDIC HERITAGE •',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.5,
+                                        color: AppColor.primary,
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 12),
 
                                   Text(
-                                    'Guarding Eternal Wisdom in a Rapidly Moving Age',
+                                    'Bridging Primordial Knowledge with Modern Living',
                                     textAlign: TextAlign.center,
                                     style: AppTextStyles.caption.copyWith(
                                       fontSize: 11,
                                       fontStyle: FontStyle.italic,
-                                      color: Colors.white70,
+                                      color: AppColor.grey,
                                     ),
                                   ),
                                 ],
@@ -285,6 +258,87 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         ),
       ),
+    );
+  }
+
+  /// Builds the animated concentric emblem badge with sacred lotus icon.
+  Widget _buildSacredEmblem() {
+    return AnimatedBuilder(
+      animation: _pulseAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _pulseAnimation.value,
+          child: Container(
+            width: 130,
+            height: 130,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColor.primary.withAlpha(120),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColor.primary.withAlpha(20),
+                  blurRadius: 30,
+                  spreadRadius: 4,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                border: Border.all(color: AppColor.border),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Image.asset(
+                    'assets/chaturvedal-logo.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      debugPrint('Splash logo load error: $error');
+                      return const SizedBox(width: 60, height: 60);
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Builds the decorative divider line with a central ornament.
+  Widget _buildDecorativeDivider() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 40,
+          height: 1,
+          color: AppColor.secondary.withAlpha(150),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          width: 6,
+          height: 6,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColor.primary,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          width: 40,
+          height: 1,
+          color: AppColor.secondary.withAlpha(150),
+        ),
+      ],
     );
   }
 }

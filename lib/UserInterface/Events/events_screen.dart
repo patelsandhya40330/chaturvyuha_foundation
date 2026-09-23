@@ -9,6 +9,11 @@ import 'package:chaturvyuha_foundation/Widgats/app_card_container.dart';
 import '../../dataProvider/event_provider.dart';
 import '../../models/event_item.dart';
 
+/// A screen displaying the Events, Programs, and Sanctuary Assemblies.
+///
+/// Features top announcement banner, featured immersion hero, category filters,
+/// upcoming assemblies grid with seat reservation request modals, visual gallery of sanctuary moments,
+/// and past assembly transcripts archives.
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
 
@@ -16,9 +21,16 @@ class EventsScreen extends StatefulWidget {
   State<EventsScreen> createState() => _EventsScreenState();
 }
 
+/// State implementation for [EventsScreen], managing active program filter,
+/// image preview modals, seat booking dialogs, and responsive layout scaling.
 class _EventsScreenState extends State<EventsScreen> {
+  /// Controller for managing main page scrolling.
   final ScrollController _scrollController = ScrollController();
+
+  /// Currently active program filter category (defaults to 'All Programs').
   String _activeFilter = 'All Programs';
+
+  /// Available program filter categories.
   final List<String> _filters = [
     'All Programs',
     'Upcoming Retreats',
@@ -33,7 +45,11 @@ class _EventsScreenState extends State<EventsScreen> {
     super.dispose();
   }
 
-  // Image Preview Modal
+  /// Displays an interactive fullscreen modal dialog showing an enlarged preview
+  /// of the specified event image.
+  ///
+  /// [imagePath] Path to the asset image.
+  /// [title] Display title for the modal header overlay.
   void _showImagePreview(String imagePath, String title) {
     showDialog(
       context: context,
@@ -49,11 +65,10 @@ class _EventsScreenState extends State<EventsScreen> {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 64,
-                    ),
+                    errorBuilder: (c, e, s) {
+                      debugPrint('Events image preview error: $e');
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ),
               ),
@@ -87,7 +102,9 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  // Seat Booking Modal
+  /// Displays a responsive seat pass booking modal dialog for requesting event entry.
+  ///
+  /// [eventTitle] Title of the event for which the seat is requested.
   void _showSeatBookingDialog(String eventTitle) {
     final nameController = TextEditingController();
     final emailController = TextEditingController();
@@ -100,80 +117,87 @@ class _EventsScreenState extends State<EventsScreen> {
         backgroundColor: AppColor.surface,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 480),
-          child: Padding(
-            padding: const EdgeInsets.all(28.0),
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "Request Seat Pass",
-                          style: AppTextStyles.title.copyWith(fontSize: 20),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(28.0),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Request Seat Pass",
+                            style: AppTextStyles.title.copyWith(fontSize: 20),
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close, size: 20),
-                        onPressed: () => Navigator.pop(ctx),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(eventTitle, style: AppTextStyles.bulletLabel),
-                  const Divider(height: 24),
-                  TextFormField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      hintText: "Full Name *",
-                      filled: true,
-                      fillColor: Color(0xFFF9F6F1),
-                      border: OutlineInputBorder(borderSide: BorderSide.none),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 20),
+                          onPressed: () => Navigator.pop(ctx),
+                        ),
+                      ],
                     ),
-                    validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Please enter your name'
-                        : null,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      hintText: "Email Address *",
-                      filled: true,
-                      fillColor: Color(0xFFF9F6F1),
-                      border: OutlineInputBorder(borderSide: BorderSide.none),
+                    const SizedBox(height: 8),
+                    Text(
+                      eventTitle,
+                      style: AppTextStyles.bulletLabel,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    validator: (v) => (v == null || !v.contains('@'))
-                        ? 'Please enter a valid email'
-                        : null,
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: AppButton(
-                      text: "Confirm Seat Pass Request",
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Seat requested for "${nameController.text.trim()}". Details sent to ${emailController.text.trim()}.',
+                    const Divider(height: 24),
+                    TextFormField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        hintText: "Full Name *",
+                        filled: true,
+                        fillColor: Color(0xFFF9F6F1),
+                        border: OutlineInputBorder(borderSide: BorderSide.none),
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Please enter your name'
+                          : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        hintText: "Email Address *",
+                        filled: true,
+                        fillColor: Color(0xFFF9F6F1),
+                        border: OutlineInputBorder(borderSide: BorderSide.none),
+                      ),
+                      validator: (v) => (v == null || !v.contains('@'))
+                          ? 'Please enter a valid email'
+                          : null,
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: AppButton(
+                        text: "Confirm Seat Pass Request",
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Seat requested for "${nameController.text.trim()}". Details sent to ${emailController.text.trim()}.',
+                                ),
+                                backgroundColor: AppColor.primary,
                               ),
-                              backgroundColor: AppColor.primary,
-                            ),
-                          );
-                        }
-                      },
-                      isPrimary: true,
+                            );
+                          }
+                        },
+                        isPrimary: true,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -234,7 +258,7 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  // --- 1. TOP NOTICE BAR ---
+  /// Builds the top announcement notice banner for upcoming major sanctuary assemblies.
   Widget _buildTopNoticeBar(bool isDesktop) {
     return Container(
       width: double.infinity,
@@ -242,7 +266,6 @@ class _EventsScreenState extends State<EventsScreen> {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          // Ensure critical notice text is always readable without overflow.
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -260,6 +283,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -285,6 +309,7 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
+  /// Builds the top breadcrumb navigation trail (Home > Events & Programs).
   Widget _buildBreadcrumbs() {
     return Row(
       children: [
@@ -304,7 +329,7 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  // --- 2. HERO FEATURED EVENT ---
+  /// Builds the hero banner displaying the featured immersion retreat card.
   Widget _buildHeroEvent(bool isDesktop) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -325,18 +350,18 @@ class _EventsScreenState extends State<EventsScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Expanded(flex: 6, child: _buildHeroImage()),
-                        Expanded(flex: 4, child: _buildHeroDetails()),
+                        Expanded(
+                          flex: 6,
+                          child: _buildHeroImage(isDesktop: true),
+                        ),
+                        Expanded(flex: 4, child: _buildHeroDetails(isDesktop)),
                       ],
                     ),
                   )
                 : Column(
                     children: [
-                      AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: _buildHeroImage(),
-                      ),
-                      _buildHeroDetails(),
+                      _buildHeroImage(isDesktop: false),
+                      _buildHeroDetails(isDesktop),
                     ],
                   ),
           ),
@@ -345,58 +370,95 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  Widget _buildHeroImage() {
+  /// Builds the image portion of the hero retreat card with title gradient overlay.
+  Widget _buildHeroImage({bool isDesktop = true}) {
     return AppCardContainer(
+      height: isDesktop ? null : 340,
       borderRadius: 0,
+      padding: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
       onTap: () => _showImagePreview(
         "assets/image_1.png",
         "Sharad Purnima Silent Immersion",
       ),
-      image: const DecorationImage(
-        image: AssetImage("assets/image_1.png"),
-        fit: BoxFit.cover,
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [Colors.black.withAlpha(150), Colors.transparent],
-          ),
-        ),
-        padding: const EdgeInsets.all(40),
-        alignment: Alignment.bottomLeft,
-        child: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SectionLabel(text: "FEATURED IMMERSION", color: Colors.white70),
-            SizedBox(height: 16),
-            Text(
-              "Sharad Purnima 7-Day Silent\nBrahma Muhurta Immersion",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Georgia',
-                height: 1.2,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            "assets/image_1.png",
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: const Color(0xFF2C1B10),
+              child: const Center(
+                child: Icon(
+                  Icons.image_outlined,
+                  size: 64,
+                  color: AppColor.primary,
+                ),
               ),
             ),
-            SizedBox(height: 16),
-            Text(
-              "A deep contemplative retreat focusing on the internal resonance of the moon cycles and Vedic silence methodologies.",
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          Container(
+            constraints: BoxConstraints(minHeight: isDesktop ? 360 : 200),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black.withAlpha(210),
+                  Colors.black.withAlpha(80),
+                  Colors.transparent,
+                ],
+                stops: const [0.0, 0.6, 1.0],
+              ),
             ),
-          ],
-        ),
+            padding: EdgeInsets.all(isDesktop ? 40 : 20),
+            alignment: Alignment.bottomLeft,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionLabel(
+                  text: "FEATURED IMMERSION",
+                  color: Colors.white70,
+                ),
+                SizedBox(height: isDesktop ? 16 : 8),
+                Text(
+                  "Sharad Purnima 7-Day Silent Brahma Muhurta Immersion",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: isDesktop ? 32 : 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Georgia',
+                    height: 1.2,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: isDesktop ? 16 : 8),
+                Text(
+                  "A deep contemplative retreat focusing on the internal resonance of the moon cycles and Vedic silence methodologies.",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: isDesktop ? 14 : 12,
+                    height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildHeroDetails() {
+  /// Builds the detail specifications side-panel inside the featured retreat hero card.
+  Widget _buildHeroDetails(bool isDesktop) {
     return Container(
       color: const Color(0xFFF9F6F1),
-      padding: const EdgeInsets.all(48),
+      padding: EdgeInsets.all(isDesktop ? 48 : 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -425,7 +487,10 @@ class _EventsScreenState extends State<EventsScreen> {
           _bulletPoint("Guided Brahma Muhurta Dhyana"),
           _bulletPoint("Soma Mandala Sukta Recitations"),
           const SizedBox(height: 40),
-          Row(
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               AppButton(
                 text: "Request Booking Seat",
@@ -434,7 +499,6 @@ class _EventsScreenState extends State<EventsScreen> {
                 ),
                 isPrimary: true,
               ),
-              const SizedBox(width: 16),
               IconButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -458,25 +522,36 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
+  /// Helper builder for individual metadata rows (Icon + Label + Value).
   Widget _eventDetailItem(IconData icon, String label, String value) {
     return Row(
       children: [
         Icon(icon, size: 18, color: AppColor.primary),
         const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: AppTextStyles.bulletLabel.copyWith(fontSize: 9)),
-            Text(
-              value,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: AppTextStyles.bulletLabel.copyWith(fontSize: 9),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
+  /// Helper builder for bulleted feature text items with check icons.
   Widget _bulletPoint(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -488,52 +563,10 @@ class _EventsScreenState extends State<EventsScreen> {
             color: AppColor.primary,
           ),
           const SizedBox(width: 12),
-          Text(
-            text,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // --- 3. FILTERS BAR ---
-  Widget _buildFiltersSection(bool isDesktop) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
-      child: Row(
-        children: [
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _filters.map((filter) {
-                  final bool isActive = _activeFilter == filter;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: ChoiceChip(
-                      label: Text(filter),
-                      selected: isActive,
-                      onSelected: (val) {
-                        if (val) setState(() => _activeFilter = filter);
-                      },
-                      selectedColor: AppColor.primary,
-                      backgroundColor: Colors.white,
-                      labelStyle: TextStyle(
-                        color: isActive ? Colors.white : Colors.black,
-                        fontSize: 12,
-                        fontWeight: isActive
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        side: const BorderSide(color: AppColor.border),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -541,8 +574,103 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  // --- 4. UPCOMING ASSEMBLIES GRID ---
+  /// Filters upcoming events based on the currently selected category [_activeFilter].
+  List<EventItem> _getFilteredUpcomingEvents(List<EventItem> events) {
+    if (_activeFilter == 'All Programs') return events;
+
+    return events.where((ev) {
+      final title = ev.title.toLowerCase();
+      final desc = ev.description.toLowerCase();
+      final filter = _activeFilter.toLowerCase();
+
+      if (filter.contains('retreat')) {
+        return title.contains('retreat') ||
+            desc.contains('retreat') ||
+            title.contains('sadhana') ||
+            desc.contains('sadhana') ||
+            desc.contains('wellness');
+      } else if (filter.contains('spiritual') || filter.contains('gathering')) {
+        return title.contains('yagna') ||
+            desc.contains('gathering') ||
+            title.contains('dhyana') ||
+            desc.contains('meditative');
+      } else if (filter.contains('vedic') || filter.contains('education')) {
+        return title.contains('grammar') ||
+            title.contains('chanting') ||
+            desc.contains('recitation') ||
+            desc.contains('prosody');
+      } else if (filter.contains('online') || filter.contains('sangha')) {
+        return desc.contains('global') || title.contains('soma');
+      }
+      return true;
+    }).toList();
+  }
+
+  /// Builds a responsive category selection chip bar for filtering events.
+  ///
+  /// On wide desktop/tablet viewports, chips wrap naturally across lines.
+  /// On mobile viewports, chips scroll horizontally in a single row.
+  Widget _buildFiltersSection(bool isDesktop) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final filterChips = _filters.map((filter) {
+            final bool isActive = _activeFilter == filter;
+            return ChoiceChip(
+              label: Text(filter),
+              selected: isActive,
+              onSelected: (val) {
+                if (val) setState(() => _activeFilter = filter);
+              },
+              selectedColor: AppColor.primary,
+              backgroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              labelStyle: TextStyle(
+                color: isActive ? Colors.white : Colors.black87,
+                fontSize: 13,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+                side: BorderSide(
+                  color: isActive ? AppColor.primary : AppColor.border,
+                ),
+              ),
+            );
+          }).toList();
+
+          if (constraints.maxWidth >= 768) {
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: filterChips,
+            );
+          } else {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: filterChips
+                    .map(
+                      (chip) => Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: chip,
+                      ),
+                    )
+                    .toList(),
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  /// Builds a responsive grid of upcoming assemblies and immersion retreats.
   Widget _buildUpcomingAssemblies(bool isDesktop, EventProvider provider) {
+    final filteredEvents = _getFilteredUpcomingEvents(provider.upcomingEvents);
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
       child: Column(
@@ -555,32 +683,57 @@ class _EventsScreenState extends State<EventsScreen> {
             style: AppTextStyles.heading2,
           ),
           const SizedBox(height: 48),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              int crossAxisCount = isDesktop ? 2 : 1;
-              double spacing = 24.0;
-              double itemWidth =
-                  (constraints.maxWidth - (crossAxisCount - 1) * spacing) /
-                  crossAxisCount;
+          if (filteredEvents.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(40),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF9F6F1),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: const Column(
+                children: [
+                  Icon(Icons.event_busy, size: 48, color: AppColor.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    "No assemblies scheduled for this category.",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.grey,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            LayoutBuilder(
+              builder: (context, constraints) {
+                int crossAxisCount = constraints.maxWidth >= 900 ? 2 : 1;
+                double spacing = 24.0;
+                double itemWidth =
+                    (constraints.maxWidth - (crossAxisCount - 1) * spacing) /
+                    crossAxisCount;
 
-              return Wrap(
-                spacing: spacing,
-                runSpacing: spacing,
-                children: provider.upcomingEvents.map((ev) {
-                  return _eventCard(itemWidth, ev);
-                }).toList(),
-              );
-            },
-          ),
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: filteredEvents.map((ev) {
+                    return _eventCard(itemWidth, ev, isDesktop);
+                  }).toList(),
+                );
+              },
+            ),
         ],
       ),
     );
   }
 
-  Widget _eventCard(double width, EventItem ev) {
+  /// Builds an individual upcoming event card widget.
+  Widget _eventCard(double width, EventItem ev, bool isDesktop) {
     return AppCardContainer(
       width: width,
-      padding: const EdgeInsets.all(32),
+      padding: EdgeInsets.all(isDesktop ? 32 : 20),
       borderRadius: 24,
       backgroundColor: Colors.white,
       child: Column(
@@ -653,17 +806,18 @@ class _EventsScreenState extends State<EventsScreen> {
           const SizedBox(height: 32),
           const Divider(),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 12,
             children: [
-              const Expanded(
-                child: Text(
-                  "Enrolling: 12 Seats Left",
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.redAccent,
-                  ),
+              const Text(
+                "Enrolling: 12 Seats Left",
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.redAccent,
                 ),
               ),
               AppButton(
@@ -682,14 +836,14 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  // --- 5. ECHOES GALLERY ---
+  /// Builds the "Echoes Gallery" section showcasing sanctuary photo memories.
   Widget _buildEchoesGallery(bool isDesktop) {
     return Container(
       width: double.infinity,
       color: const Color(0xFFF9F6F1),
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 60 : 20,
-        vertical: 100,
+        vertical: isDesktop ? 100 : 60,
       ),
       child: Center(
         child: ConstrainedBox(
@@ -697,36 +851,61 @@ class _EventsScreenState extends State<EventsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: Column(
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < 800) {
+                    return const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SectionLabel(text: "SANCTUARY MOMENTS"),
-                        const SizedBox(height: 24),
-                        const Text(
+                        SectionLabel(text: "SANCTUARY MOMENTS"),
+                        SizedBox(height: 16),
+                        Text(
                           "Echoes of Gurukula, Ghats & Yagya",
                           style: AppTextStyles.heading2,
                         ),
+                        SizedBox(height: 12),
+                        Text(
+                          "A visual archival of our previous assemblies, capturing the essence of spiritual study and traditional methodology across various holy sites.",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                            height: 1.6,
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
-                  if (isDesktop)
-                    const Expanded(
-                      flex: 4,
-                      child: Text(
-                        "A visual archival of our previous assemblies, capturing the essence of spiritual study and traditional methodology across various holy sites.",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
-                          height: 1.6,
+                    );
+                  }
+                  return const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SectionLabel(text: "SANCTUARY MOMENTS"),
+                            SizedBox(height: 24),
+                            Text(
+                              "Echoes of Gurukula, Ghats & Yagya",
+                              style: AppTextStyles.heading2,
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                ],
+                      Expanded(
+                        flex: 4,
+                        child: Text(
+                          "A visual archival of our previous assemblies, capturing the essence of spiritual study and traditional methodology across various holy sites.",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                            height: 1.6,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 60),
               if (isDesktop)
@@ -768,7 +947,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     _galleryCard(
                       "Veda Pathashala Palm-Leaf Reading Assembly",
                       "assets/image_2.png",
-                      height: 300,
+                      height: 260,
                     ),
                     const SizedBox(height: 24),
                     _galleryCard(
@@ -791,6 +970,7 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
+  /// Builds a gallery photo card widget with bottom section overlay title.
   Widget _galleryCard(String title, String img, {required double height}) {
     return AppCardContainer(
       height: height,
@@ -802,7 +982,20 @@ class _EventsScreenState extends State<EventsScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(img, fit: BoxFit.cover),
+          Image.asset(
+            img,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: const Color(0xFF2C1B10),
+              child: const Center(
+                child: Icon(
+                  Icons.photo_library_outlined,
+                  size: 48,
+                  color: AppColor.primary,
+                ),
+              ),
+            ),
+          ),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -840,41 +1033,81 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  // --- 6. PAST ASSEMBLIES & TRANSCRIPTS ---
+  /// Builds the past assemblies section with audio transcripts & archives.
   Widget _buildPastAssemblies(bool isDesktop, EventProvider provider) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Past Assemblies & Audio Transcripts",
-                style: AppTextStyles.heading2,
-              ),
-              TextButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Loading all historical sanctuary assembly archives...',
+          LayoutBuilder(
+            builder: (context, box) {
+              bool isNarrow = box.maxWidth < 600;
+              if (isNarrow) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Past Assemblies & Audio Transcripts",
+                      style: AppTextStyles.heading2,
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Loading all historical sanctuary assembly archives...',
+                            ),
+                          ),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        alignment: Alignment.centerLeft,
+                      ),
+                      child: const Text(
+                        "View All Records →",
+                        style: AppTextStyles.link,
                       ),
                     ),
-                  );
-                },
-                child: const Text(
-                  "View All Records →",
-                  style: AppTextStyles.link,
-                ),
-              ),
-            ],
+                  ],
+                );
+              }
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Expanded(
+                    child: Text(
+                      "Past Assemblies & Audio Transcripts",
+                      style: AppTextStyles.heading2,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Loading all historical sanctuary assembly archives...',
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "View All Records →",
+                      style: AppTextStyles.link,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 48),
           LayoutBuilder(
             builder: (context, constraints) {
-              int crossAxisCount = isDesktop ? 3 : 1;
+              int crossAxisCount = constraints.maxWidth >= 1100
+                  ? 3
+                  : (constraints.maxWidth >= 700 ? 2 : 1);
               double spacing = 24.0;
               double itemWidth =
                   (constraints.maxWidth - (crossAxisCount - 1) * spacing) /
@@ -886,7 +1119,7 @@ class _EventsScreenState extends State<EventsScreen> {
                 children: provider.pastEvents.map((ev) {
                   return AppCardContainer(
                     width: itemWidth,
-                    padding: const EdgeInsets.all(32),
+                    padding: EdgeInsets.all(isDesktop ? 32 : 20),
                     borderRadius: 24,
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -945,11 +1178,14 @@ class _EventsScreenState extends State<EventsScreen> {
                                 color: AppColor.primary,
                               ),
                               const SizedBox(width: 10),
-                              Text(
-                                "Transcript & Audio Available",
-                                style: AppTextStyles.bodySmall.copyWith(
-                                  color: AppColor.primary,
-                                  fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: Text(
+                                  "Transcript & Audio Available",
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColor.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],

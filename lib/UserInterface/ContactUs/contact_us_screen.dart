@@ -86,11 +86,10 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 64,
-                    ),
+                    errorBuilder: (c, e, s) {
+                      debugPrint('Contact us image preview error: $e');
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ),
               ),
@@ -188,15 +187,19 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           RichText(
             text: TextSpan(
               style: AppTextStyles.heroHeading.copyWith(
-                fontSize: isDesktop ? 54 : 36,
+                fontSize: isDesktop
+                    ? 54
+                    : (MediaQuery.of(context).size.width < 400 ? 28 : 36),
                 height: 1.1,
               ),
               children: [
                 const TextSpan(text: "Connect With the "),
                 TextSpan(
-                  text: "Sanctuary of Eternal\nLight",
+                  text: "Sanctuary of Eternal Light",
                   style: AppTextStyles.heroSubheading.copyWith(
-                    fontSize: isDesktop ? 54 : 36,
+                    fontSize: isDesktop
+                        ? 54
+                        : (MediaQuery.of(context).size.width < 400 ? 28 : 36),
                   ),
                 ),
               ],
@@ -815,6 +818,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                       height: 250,
                       width: double.infinity,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        debugPrint('Contact image load error: $error');
+                        return Container(
+                          height: 250,
+                          width: double.infinity,
+                          color: const Color(0xFF2C1B10),
+                        );
+                      },
                     ),
                     Padding(
                       padding: const EdgeInsets.all(32),

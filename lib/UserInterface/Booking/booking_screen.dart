@@ -318,9 +318,11 @@ class _BookingScreenState extends State<BookingScreen> {
           const SectionLabel(text: "MY SANCTUARY RESERVATIONS"),
           const SizedBox(height: 24),
           Text(
-            'My Session Bookings &\nDigital Entry Passes',
+            'My Session Bookings & Digital Entry Passes',
             style: AppTextStyles.heroHeading.copyWith(
-              fontSize: isDesktop ? 54 : 36,
+              fontSize: isDesktop
+                  ? 54
+                  : (MediaQuery.of(context).size.width < 400 ? 28 : 36),
               height: 1.1,
             ),
           ),
@@ -377,12 +379,17 @@ class _BookingScreenState extends State<BookingScreen> {
       },
     ];
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = isDesktop
+        ? 220.0
+        : (screenWidth < 400 ? double.infinity : (screenWidth - 64) / 2);
+
     return Wrap(
       spacing: 24,
       runSpacing: 24,
       children: stats.map((s) {
         return Container(
-          width: isDesktop ? 220 : (MediaQuery.of(context).size.width - 60) / 2,
+          width: itemWidth,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: const Color(0xFFF9F6F1),

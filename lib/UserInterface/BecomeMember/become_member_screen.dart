@@ -138,11 +138,10 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 64,
-                    ),
+                    errorBuilder: (c, e, s) {
+                      debugPrint('Member preview image error: $e');
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ),
               ),
@@ -199,8 +198,6 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
 
                 const SizedBox(height: 120),
 
-                const SizedBox(height: 120),
-
                 // 4. FAQ SECTION
                 _buildFAQSection(isDesktop, membershipProvider),
 
@@ -250,9 +247,11 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
           const SectionLabel(text: "INITIATION & SANGHA PORTAL"),
           const SizedBox(height: 24),
           Text(
-            'Walk the Path of Living Wisdom — Member\nSanctuary',
+            'Walk the Path of Living Wisdom — Member Sanctuary',
             style: AppTextStyles.heroHeading.copyWith(
-              fontSize: isDesktop ? 54 : 36,
+              fontSize: isDesktop
+                  ? 54
+                  : (MediaQuery.of(context).size.width < 400 ? 28 : 36),
               height: 1.1,
             ),
           ),
@@ -523,8 +522,6 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
               "Step into the eternal mandate of the Sanctuary",
               style: TextStyle(fontSize: 12, color: Colors.black38),
             ),
-            const SizedBox(height: 32),
-
             const SizedBox(height: 32),
             LayoutBuilder(
               builder: (context, box) {
@@ -890,7 +887,7 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
                         ),
                         children: [
                           TextSpan(
-                            text: "Need help accessing Kutir reservations?\n",
+                            text: "Need help accessing Kutir reservations? ",
                           ),
                           TextSpan(text: "Contact Ashram Seva Desk at "),
                           TextSpan(
@@ -1031,11 +1028,14 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
                 ? IconButton(
                     icon: Icon(
                       isPasswordVisible
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                      size: 18,
-                      color: Colors.black45,
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      size: 20,
+                      color: AppColor.primary,
                     ),
+                    tooltip: isPasswordVisible
+                        ? "Hide Paraphrase"
+                        : "Show Paraphrase",
                     onPressed: onTogglePassword,
                   )
                 : null,

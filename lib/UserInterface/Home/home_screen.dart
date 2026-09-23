@@ -7,6 +7,8 @@ import 'package:chaturvyuha_foundation/Widgats/app_footer.dart';
 import 'package:chaturvyuha_foundation/Widgats/app_button.dart';
 import 'package:chaturvyuha_foundation/Widgats/app_card_container.dart';
 
+/// The main Home landing screen displaying hero slideshows, sacred gateways,
+/// featured practices, Sanskrit intensive banners, visual gallery, and validated email newsletter subscriptions.
 class HomeScreen extends StatefulWidget {
   final ValueChanged<int>? onTabSelected;
   const HomeScreen({super.key, this.onTabSelected});
@@ -15,10 +17,20 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+/// State implementation for [HomeScreen], managing scroll control,
+/// auto-scrolling hero slideshow, welcome popup dialog, and validated email form subscriptions.
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   final PageController _pageController = PageController();
   Timer? _timer;
+
+  /// Controllers and FormKeys for email inputs with validation.
+  final TextEditingController _newsletterEmailController =
+      TextEditingController();
+  final _newsletterFormKey = GlobalKey<FormState>();
+
+  final TextEditingController _popupEmailController = TextEditingController();
+  final _popupFormKey = GlobalKey<FormState>();
 
   // List of images for the hero slideshow
   final List<String> _heroImages = [
@@ -41,7 +53,52 @@ class _HomeScreenState extends State<HomeScreen> {
     _timer?.cancel();
     _pageController.dispose();
     _scrollController.dispose();
+    _newsletterEmailController.dispose();
+    _popupEmailController.dispose();
     super.dispose();
+  }
+
+  /// Helper validator for email string formats.
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Please enter your email address';
+    }
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value.trim())) {
+      return 'Please enter a valid email address';
+    }
+    return null;
+  }
+
+  /// Handles newsletter email subscription form submission.
+  void _submitNewsletter() {
+    if (_newsletterFormKey.currentState!.validate()) {
+      final email = _newsletterEmailController.text.trim();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Subscribed! Weekly Contemplative Darshan sent to $email.',
+          ),
+          backgroundColor: AppColor.primary,
+        ),
+      );
+      _newsletterEmailController.clear();
+    }
+  }
+
+  /// Handles welcome popup email booking submission.
+  void _submitPopupBooking(BuildContext popupContext) {
+    if (_popupFormKey.currentState!.validate()) {
+      final email = _popupEmailController.text.trim();
+      Navigator.pop(popupContext);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Welcome! Spot booked for $email. Confirmation sent.'),
+          backgroundColor: AppColor.primary,
+        ),
+      );
+      _popupEmailController.clear();
+    }
   }
 
   @override
@@ -124,35 +181,58 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeroLeftContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionLabelWithDot(" WISDOM • WELLNESS • COMMUNITY"),
-        const SizedBox(height: 24),
-        const Text("Ancient Wisdom.", style: AppTextStyles.heroHeading),
-        const Text("A Meaningful Life.", style: AppTextStyles.heroSubheading),
-        const SizedBox(height: 32),
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 540),
-          child: const Text(
-            "Discover classical Vedic learning, mindful yoga sciences, and indigenous cultural traditions crafted to inspire balanced human potential and unite a conscious seeker collective.",
-            style: AppTextStyles.bodyLarge,
-          ),
-        ),
-        const SizedBox(height: 48),
-        AppButton(
-          text: "Become a Member",
-          onPressed: () => widget.onTabSelected?.call(8),
-          isPrimary: true,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isDesktop = screenWidth >= 1100;
+        final isMobile = screenWidth < 600;
+
+        final double heroTitleSize = isDesktop ? 72 : (isMobile ? 32 : 48);
+        final double heroSubSize = isDesktop ? 48 : (isMobile ? 24 : 36);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionLabelWithDot(" WISDOM • WELLNESS • COMMUNITY"),
+            const SizedBox(height: 24),
+            Text(
+              "Ancient Wisdom.",
+              style: AppTextStyles.heroHeading.copyWith(
+                fontSize: heroTitleSize,
+              ),
+            ),
+            Text(
+              "A Meaningful Life.",
+              style: AppTextStyles.heroSubheading.copyWith(
+                fontSize: heroSubSize,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 540),
+              child: Text(
+                "Discover classical Vedic learning, mindful yoga sciences, and indigenous cultural traditions crafted to inspire balanced human potential and unite a conscious seeker collective.",
+                style: AppTextStyles.bodyLarge.copyWith(
+                  fontSize: isMobile ? 15 : 18,
+                ),
+              ),
+            ),
+            const SizedBox(height: 36),
+            AppButton(
+              text: "Become a Member",
+              onPressed: () => widget.onTabSelected?.call(9),
+              isPrimary: true,
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildHeroRightCard(bool isDesktop) {
     return AppCardContainer(
       width: double.infinity,
-      height: isDesktop ? 450 : 320, // Responsive height for hero card
+      height: isDesktop ? 450 : 320,
       backgroundColor: const Color(0xFFF9F6F1),
       borderRadius: 32,
       borderColor: null,
@@ -197,7 +277,6 @@ class _HomeScreenState extends State<HomeScreen> {
           style: AppTextStyles.body,
         ),
         const SizedBox(height: 48),
-        // Wrap layout for responsive Gateway Cards without rigid GridView heights
         LayoutBuilder(
           builder: (context, constraints) {
             final double width = constraints.maxWidth;
@@ -486,7 +565,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 40),
           AppButton(
             text: "Apply For Fellowship",
-            onPressed: () => widget.onTabSelected?.call(8),
+            onPressed: () => widget.onTabSelected?.call(9),
             isPrimary: true,
           ),
         ],
@@ -579,35 +658,57 @@ class _HomeScreenState extends State<HomeScreen> {
       height: 350,
       borderRadius: 24,
       borderColor: null,
+      clipBehavior: Clip.antiAlias,
+      padding: EdgeInsets.zero,
       onTap: () => widget.onTabSelected?.call(6),
-      image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
-      child: Container(
-        padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [Colors.black.withAlpha(200), Colors.transparent],
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Georgia',
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            imagePath,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: const Color(0xFFE5DED4),
+              child: const Icon(
+                Icons.image_outlined,
+                size: 64,
+                color: AppColor.primary,
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
             ),
-          ],
-        ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black.withAlpha(200),
+                  Colors.black.withAlpha(40),
+                  Colors.transparent,
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Georgia',
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -617,103 +718,97 @@ class _HomeScreenState extends State<HomeScreen> {
     return AppCardContainer(
       padding: EdgeInsets.all(isDesktop ? 60 : 28),
       borderRadius: 32,
-      child: Column(
-        children: [
-          _buildSectionLabelWithDot("JOIN THE SEEKER SANGHA"),
-          const SizedBox(height: 24),
-          const Text(
-            "Weekly Contemplative Darshan",
-            style: AppTextStyles.heading2,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            "Receive Sunday Upanishad reflections, auspicious astronomical calendars, and sacred lifestyle guidance directly into your sanctuary inbox every week.",
-            style: AppTextStyles.body,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 40),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth < 450) {
-                  return Column(
-                    children: [
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: "Enter Your Email",
-                          filled: true,
-                          fillColor: AppColor.backgroundColor,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
+      child: Form(
+        key: _newsletterFormKey,
+        child: Column(
+          children: [
+            _buildSectionLabelWithDot("JOIN THE SEEKER SANGHA"),
+            const SizedBox(height: 24),
+            const Text(
+              "Weekly Contemplative Darshan",
+              style: AppTextStyles.heading2,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              "Receive Sunday Upanishad reflections, auspicious astronomical calendars, and sacred lifestyle guidance directly into your sanctuary inbox every week.",
+              style: AppTextStyles.body,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 40),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth < 450) {
+                    return Column(
+                      children: [
+                        TextFormField(
+                          controller: _newsletterEmailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: _validateEmail,
+                          decoration: InputDecoration(
+                            hintText: "Enter Your Email *",
+                            filled: true,
+                            fillColor: AppColor.backgroundColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: AppButton(
+                            text: "Subscribe",
+                            onPressed: _submitNewsletter,
+                            isPrimary: true,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _newsletterEmailController,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: _validateEmail,
+                          decoration: InputDecoration(
+                            hintText: "Enter Your Email *",
+                            filled: true,
+                            fillColor: AppColor.backgroundColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: AppButton(
-                          text: "Subscribe",
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Subscribed to Weekly Contemplative Darshan!',
-                                ),
-                              ),
-                            );
-                          },
-                          isPrimary: true,
-                        ),
+                      const SizedBox(width: 16),
+                      AppButton(
+                        text: "Subscribe",
+                        onPressed: _submitNewsletter,
+                        isPrimary: true,
                       ),
                     ],
                   );
-                }
-                return Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: "Enter Your Email",
-                          filled: true,
-                          fillColor: AppColor.backgroundColor,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    AppButton(
-                      text: "Subscribe",
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Subscribed to Weekly Contemplative Darshan!',
-                            ),
-                          ),
-                        );
-                      },
-                      isPrimary: true,
-                    ),
-                  ],
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -732,7 +827,7 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) {
+      builder: (BuildContext popupContext) {
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(
@@ -750,134 +845,150 @@ class _HomeScreenState extends State<HomeScreen> {
                   SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.all(28.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 8),
+                      child: Form(
+                        key: _popupFormKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 8),
 
-                          const Text(
-                            "Begin Your Contemplative Journey into the Vedas",
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1A1A1A),
-                              fontFamily: 'Georgia',
-                              height: 1.2,
+                            const Text(
+                              "Begin Your Contemplative Journey into the Vedas",
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1A1A1A),
+                                fontFamily: 'Georgia',
+                                height: 1.2,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Preserving 3,000+ years of primordial oral transmission, sacred phonetics, and Vedic wisdom translated for daily mindful living.",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black.withAlpha(160),
-                              height: 1.5,
+                            const SizedBox(height: 16),
+                            Text(
+                              "Preserving 3,000+ years of primordial oral transmission, sacred phonetics, and Vedic wisdom translated for daily mindful living.",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black.withAlpha(160),
+                                height: 1.5,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          _buildPopupItem(
-                            icon: Icons.waves,
-                            title: "Daily Prātah Sādhana",
-                            subtitle:
-                                "Listen to 432Hz consecrated dawn chants & Vedic phonetics.",
-                          ),
-                          const SizedBox(height: 12),
-                          _buildPopupItem(
-                            icon: Icons.auto_stories,
-                            title: "The Four Vedas Guide",
-                            subtitle:
-                                "An introductory handbook to the Samhitas, Brahmanas & Upanishads.",
-                          ),
-                          const SizedBox(height: 12),
-                          _buildPopupItem(
-                            icon: Icons.mail_outline,
-                            title: "Join the Seeker Circle",
-                            subtitle:
-                                "Receive fortnightly Sandhya Patrika & lunar transit contemplations.",
-                          ),
-                          const SizedBox(height: 28),
-                          LayoutBuilder(
-                            builder: (context, constraints) {
-                              if (constraints.maxWidth < 400) {
-                                return Column(
-                                  children: [
-                                    TextField(
-                                      decoration: InputDecoration(
-                                        hintText: "Enter your email address",
-                                        hintStyle: TextStyle(
-                                          color: Colors.black.withAlpha(80),
-                                          fontSize: 14,
-                                        ),
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            30,
+                            const SizedBox(height: 24),
+                            _buildPopupItem(
+                              icon: Icons.waves,
+                              title: "Daily Prātah Sādhana",
+                              subtitle:
+                                  "Listen to 432Hz consecrated dawn chants & Vedic phonetics.",
+                            ),
+                            const SizedBox(height: 12),
+                            _buildPopupItem(
+                              icon: Icons.auto_stories,
+                              title: "The Four Vedas Guide",
+                              subtitle:
+                                  "An introductory handbook to the Samhitas, Brahmanas & Upanishads.",
+                            ),
+                            const SizedBox(height: 12),
+                            _buildPopupItem(
+                              icon: Icons.mail_outline,
+                              title: "Join the Seeker Circle",
+                              subtitle:
+                                  "Receive fortnightly Sandhya Patrika & lunar transit contemplations.",
+                            ),
+                            const SizedBox(height: 28),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                if (constraints.maxWidth < 400) {
+                                  return Column(
+                                    children: [
+                                      TextFormField(
+                                        controller: _popupEmailController,
+                                        keyboardType:
+                                            TextInputType.emailAddress,
+                                        validator: _validateEmail,
+                                        decoration: InputDecoration(
+                                          hintText:
+                                              "Enter your email address *",
+                                          hintStyle: TextStyle(
+                                            color: Colors.black.withAlpha(80),
+                                            fontSize: 14,
                                           ),
-                                          borderSide: BorderSide(
-                                            color: Colors.black.withAlpha(20),
-                                          ),
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 20,
-                                              vertical: 16,
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              30,
                                             ),
+                                            borderSide: BorderSide(
+                                              color: Colors.black.withAlpha(20),
+                                            ),
+                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 20,
+                                                vertical: 16,
+                                              ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: AppButton(
+                                          text: "Book My Spot",
+                                          onPressed: () =>
+                                              _submitPopupBooking(popupContext),
+                                          borderRadius: 30,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _popupEmailController,
+                                        keyboardType:
+                                            TextInputType.emailAddress,
+                                        validator: _validateEmail,
+                                        decoration: InputDecoration(
+                                          hintText:
+                                              "Enter your email address *",
+                                          hintStyle: TextStyle(
+                                            color: Colors.black.withAlpha(80),
+                                            fontSize: 14,
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              30,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.black.withAlpha(20),
+                                            ),
+                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 20,
+                                                vertical: 16,
+                                              ),
+                                        ),
                                       ),
                                     ),
-                                    const SizedBox(height: 12),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: AppButton(
-                                        text: "Book My Spot",
-                                        onPressed: () => Navigator.pop(context),
-                                        borderRadius: 30,
-                                      ),
+                                    const SizedBox(width: 12),
+                                    AppButton(
+                                      text: "Book My Spot",
+                                      onPressed: () =>
+                                          _submitPopupBooking(popupContext),
+                                      borderRadius: 30,
                                     ),
                                   ],
                                 );
-                              }
-                              return Row(
-                                children: [
-                                  Expanded(
-                                    child: TextField(
-                                      decoration: InputDecoration(
-                                        hintText: "Enter your email address",
-                                        hintStyle: TextStyle(
-                                          color: Colors.black.withAlpha(80),
-                                          fontSize: 14,
-                                        ),
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            30,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.black.withAlpha(20),
-                                          ),
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              horizontal: 20,
-                                              vertical: 16,
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  AppButton(
-                                    text: "Book My Spot",
-                                    onPressed: () => Navigator.pop(context),
-                                    borderRadius: 30,
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                        ],
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -885,7 +996,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     top: 16,
                     right: 16,
                     child: IconButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(popupContext),
                       icon: const Icon(Icons.close, color: Colors.black54),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.black.withAlpha(10),

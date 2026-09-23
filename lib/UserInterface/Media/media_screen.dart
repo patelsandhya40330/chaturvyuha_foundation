@@ -55,11 +55,10 @@ class _MediaScreenState extends State<MediaScreen> {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 64,
-                    ),
+                    errorBuilder: (c, e, s) {
+                      debugPrint('Media image preview error: $e');
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ),
               ),
@@ -251,9 +250,11 @@ class _MediaScreenState extends State<MediaScreen> {
           const SectionLabel(text: "SONIC & VISUAL ARCHIVE"),
           const SizedBox(height: 24),
           Text(
-            'Preserving the Sonic & Visual\nHeritage of Sanātana Dharma',
+            'Preserving the Sonic & Visual Heritage of Sanātana Dharma',
             style: AppTextStyles.heroHeading.copyWith(
-              fontSize: isDesktop ? 54 : 36,
+              fontSize: isDesktop
+                  ? 54
+                  : (MediaQuery.of(context).size.width < 400 ? 28 : 36),
               height: 1.1,
             ),
           ),
@@ -292,12 +293,17 @@ class _MediaScreenState extends State<MediaScreen> {
   }
 
   Widget _buildStatsBar(bool isDesktop, MediaProvider provider) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = isDesktop
+        ? 200.0
+        : (screenWidth < 400 ? double.infinity : (screenWidth - 64) / 2);
+
     return Wrap(
       spacing: 24,
       runSpacing: 24,
       children: provider.mediaStats.entries.map((e) {
         return Container(
-          width: isDesktop ? 200 : (MediaQuery.of(context).size.width - 60) / 2,
+          width: itemWidth,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: const Color(0xFFF9F6F1),
@@ -486,21 +492,38 @@ class _MediaScreenState extends State<MediaScreen> {
       onTap: () => _showMediaPlaybackDialog(item),
       child: Container(
         height: isMobile ? 250 : 500,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(item.assetPath),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: AppColor.primary,
-              shape: BoxShape.circle,
+        clipBehavior: Clip.antiAlias,
+        decoration: const BoxDecoration(),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              item.assetPath,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: const Color(0xFFE5DED4),
+                child: const Icon(
+                  Icons.play_circle_outline,
+                  size: 64,
+                  color: AppColor.primary,
+                ),
+              ),
             ),
-            child: const Icon(Icons.play_arrow, color: Colors.white, size: 40),
-          ),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: const BoxDecoration(
+                  color: AppColor.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -616,12 +639,20 @@ class _MediaScreenState extends State<MediaScreen> {
             width: double.infinity,
             padding: EdgeInsets.zero,
             borderRadius: 20,
+            clipBehavior: Clip.antiAlias,
             onTap: () => _showImagePreview(p.assetPath, p.title),
-            image: DecorationImage(
-              image: AssetImage(p.assetPath),
+            child: Image.asset(
+              p.assetPath,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: const Color(0xFFE5DED4),
+                child: const Icon(
+                  Icons.image_outlined,
+                  size: 64,
+                  color: AppColor.primary,
+                ),
+              ),
             ),
-            child: const SizedBox.shrink(),
           ),
           const SizedBox(height: 20),
           Text(

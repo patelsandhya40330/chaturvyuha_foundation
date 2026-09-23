@@ -178,14 +178,19 @@ class _Brand extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
             color: AppColor.primary.withAlpha(20),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.spa, color: AppColor.primary, size: 24),
+          child: Image.asset(
+            'assets/chaturvedal-logo.png',
+            width: 28,
+            height: 28,
+            fit: BoxFit.contain,
+          ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         Flexible(
           child: Text(
             'CHATURVEDA\nFoundations',
@@ -193,8 +198,8 @@ class _Brand extends StatelessWidget {
             maxLines: 2,
             style: AppTextStyles.heading2.copyWith(
               color: AppColor.primary,
-              fontSize: desktop ? 18 : 16,
-              letterSpacing: 1.5,
+              fontSize: desktop ? 18 : 15,
+              letterSpacing: 1.2,
               height: 1.1,
             ),
           ),
@@ -644,7 +649,25 @@ class _DrawerBrand extends StatelessWidget {
                 icon: const Icon(Icons.close, color: Colors.white),
               ),
             ),
-            const Center(child: Icon(Icons.spa, color: Colors.white, size: 40)),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Colors.white24,
+                  shape: BoxShape.circle,
+                ),
+                child: Image.asset(
+                  'assets/chaturvedal-logo.png',
+                  height: 48,
+                  width: 48,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    debugPrint('Drawer logo load error: $error');
+                    return const SizedBox(width: 48, height: 48);
+                  },
+                ),
+              ),
+            ),
             const SizedBox(height: 12),
             const Text(
               'CHATURVEDA',

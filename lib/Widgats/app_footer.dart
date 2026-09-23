@@ -142,12 +142,21 @@ class AppFooter extends StatelessWidget {
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: const BoxDecoration(
                 color: AppColor.lightPrimary,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.spa, color: AppColor.primary, size: 28),
+              child: Image.asset(
+                'assets/chaturvedal-logo.png',
+                width: 32,
+                height: 32,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  debugPrint('Footer logo load error: $error');
+                  return const SizedBox(width: 32, height: 32);
+                },
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -240,16 +249,14 @@ class AppFooter extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        Row(
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
           children: [
             _socialIconButton(context, Icons.facebook, "Facebook"),
-            const SizedBox(width: 10),
             _socialIconButton(context, Icons.camera_alt_outlined, "Instagram"),
-            const SizedBox(width: 10),
             _socialIconButton(context, Icons.smart_display_outlined, "YouTube"),
-            const SizedBox(width: 10),
             _socialIconButton(context, Icons.chat_bubble_outline, "WhatsApp"),
-            const SizedBox(width: 10),
             _socialIconButton(context, Icons.email_outlined, "Email"),
           ],
         ),

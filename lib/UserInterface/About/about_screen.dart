@@ -119,11 +119,10 @@ class _AboutScreenState extends State<AboutScreen> {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 64,
-                    ),
+                    errorBuilder: (c, e, s) {
+                      debugPrint('About image preview load error: $e');
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ),
               ),
@@ -333,19 +332,28 @@ class _AboutScreenState extends State<AboutScreen> {
       clipBehavior: Clip.none,
       children: [
         AppCardContainer(
-          height: 400,
+          height: isDesktop ? 400 : 280,
           width: double.infinity,
           borderRadius: 24,
           borderColor: null,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.zero,
           onTap: () => _showImagePreview(
             "assets/image_3.png",
             "Rigveda Śākala Saṁhitā Codices",
           ),
-          image: const DecorationImage(
-            image: AssetImage("assets/image_3.png"),
+          child: Image.asset(
+            "assets/image_3.png",
             fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              color: const Color(0xFFE5DED4),
+              child: const Icon(
+                Icons.image_outlined,
+                size: 64,
+                color: AppColor.primary,
+              ),
+            ),
           ),
-          child: const SizedBox.shrink(),
         ),
         Positioned(
           bottom: 20,
@@ -689,9 +697,22 @@ class _AboutScreenState extends State<AboutScreen> {
           width: 140,
           height: 140,
           shape: BoxShape.circle,
+          clipBehavior: Clip.antiAlias,
+          padding: EdgeInsets.zero,
           onTap: () => _showImagePreview(img, name),
-          image: DecorationImage(image: AssetImage(img), fit: BoxFit.cover),
-          child: const SizedBox.shrink(),
+          child: Image.asset(
+            img,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => CircleAvatar(
+              radius: 70,
+              backgroundColor: AppColor.primary.withAlpha(30),
+              child: const Icon(
+                Icons.person,
+                color: AppColor.primary,
+                size: 48,
+              ),
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         Text(name, style: AppTextStyles.title.copyWith(fontSize: 16)),
@@ -708,55 +729,91 @@ class _AboutScreenState extends State<AboutScreen> {
         horizontal: isDesktop ? 60 : 20,
         vertical: 80,
       ),
-      child: Row(
-        children: [
-          if (isDesktop) ...[
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(60),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFDFBF7),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.spa,
-                  color: AppColor.primary,
-                  size: 140,
-                ),
-              ),
-            ),
-            const SizedBox(width: 80),
-          ],
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SectionLabel(text: "THE SYMBOLISM"),
-                const SizedBox(height: 24),
-                const Text(
-                  "The Sacred Emblem: A Root Seal",
-                  style: AppTextStyles.heading2,
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  "The official seal of the Chaturveda Foundation encapsulates the infinite cycle of wisdom. The central motif represents the union of the four Vedas, while the surrounding geometry signifies the protective embrace of the community and the continuity of the sacred lineage.",
-                  style: AppTextStyles.body,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final showSideLogo = constraints.maxWidth >= 800;
+          return Column(
+            children: [
+              if (!showSideLogo) ...[
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFDFBF7),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Image.asset(
+                      'assets/chaturvedal-logo.png',
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        debugPrint('About logo load error: $error');
+                        return const SizedBox(width: 90, height: 90);
+                      },
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 32),
-                AppButton(
-                  text: "Identity Guidelines",
-                  onPressed: () => _showInfoDialog(
-                    "Identity Guidelines - The Sacred Seal",
-                    "The official seal of the Chaturveda Foundation encapsulates the infinite cycle of wisdom. The central motif represents the union of the four Vedas, while the surrounding geometry signifies the protective embrace of the community and the continuity of the sacred lineage. Usage of this emblem is restricted to official non-profit publications and consecrated study materials.",
-                  ),
-                  isPrimary: false,
-                  showIcon: false,
-                ),
               ],
-            ),
-          ),
-        ],
+              Row(
+                children: [
+                  if (showSideLogo) ...[
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(40),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFFDFBF7),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Image.asset(
+                          'assets/chaturvedal-logo.png',
+                          width: 140,
+                          height: 140,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            debugPrint('About side logo load error: $error');
+                            return const SizedBox(width: 140, height: 140);
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 60),
+                  ],
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SectionLabel(text: "THE SYMBOLISM"),
+                        const SizedBox(height: 24),
+                        const Text(
+                          "The Sacred Emblem: A Root Seal",
+                          style: AppTextStyles.heading2,
+                        ),
+                        const SizedBox(height: 24),
+                        const Text(
+                          "The official seal of the Chaturveda Foundation encapsulates the infinite cycle of wisdom. The central motif represents the union of the four Vedas, while the surrounding geometry signifies the protective embrace of the community and the continuity of the sacred lineage.",
+                          style: AppTextStyles.body,
+                        ),
+                        const SizedBox(height: 32),
+                        AppButton(
+                          text: "Identity Guidelines",
+                          onPressed: () => _showInfoDialog(
+                            "Identity Guidelines - The Sacred Seal",
+                            "The official seal of the Chaturveda Foundation encapsulates the infinite cycle of wisdom. The central motif represents the union of the four Vedas, while the surrounding geometry signifies the protective embrace of the community and the continuity of the sacred lineage. Usage of this emblem is restricted to official non-profit publications and consecrated study materials.",
+                          ),
+                          isPrimary: false,
+                          showIcon: false,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -9,6 +9,11 @@ import 'package:chaturvyuha_foundation/Widgats/app_card_container.dart';
 import '../../dataProvider/article_provider.dart';
 import '../../models/article_item.dart';
 
+/// A screen displaying the Articles and Canonical Research Library.
+///
+/// Features search and filtering capabilities across various Vedic research categories,
+/// featured articles, dissertations grid, related discourses, newsletter digest subscription,
+/// and full article reading view.
 class ArticlesScreen extends StatefulWidget {
   const ArticlesScreen({super.key});
 
@@ -16,16 +21,32 @@ class ArticlesScreen extends StatefulWidget {
   State<ArticlesScreen> createState() => _ArticlesScreenState();
 }
 
+/// State implementation for [ArticlesScreen], managing search query filter,
+/// category selection, active article detail view, and digest subscription logic.
 class _ArticlesScreenState extends State<ArticlesScreen> {
+  /// Controller for managing main page scrolling.
   final ScrollController _scrollController = ScrollController();
+
+  /// Controller for the newsletter subscription email input field.
   final TextEditingController _digestEmailController = TextEditingController();
+
+  /// Global form key for validating newsletter email input.
   final _digestFormKey = GlobalKey<FormState>();
 
+  /// Active search query string used to filter articles.
   String _searchQuery = '';
+
+  /// Currently selected category filter name (defaults to 'All Library').
   String _selectedCategory = 'All Library';
+
+  /// Currently selected [ArticleItem] for detailed reader view.
+  /// If null, the main article index view is displayed.
   ArticleItem? _activeArticle;
+
+  /// Flag indicating whether a digest newsletter subscription is currently being processed.
   bool _isDigestSubmitting = false;
 
+  /// Available article category filters.
   final List<String> _categories = [
     'All Library',
     'Philosophy',
@@ -43,7 +64,9 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     super.dispose();
   }
 
-  // Digest Subscription Handler
+  /// Validates the newsletter email input and submits the subscription request.
+  ///
+  /// Displays a confirmation [SnackBar] upon successful subscription.
   Future<void> _subscribeDigest() async {
     if (_digestFormKey.currentState!.validate()) {
       setState(() => _isDigestSubmitting = true);
@@ -63,7 +86,11 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     }
   }
 
-  // Image Preview Modal
+  /// Displays an interactive fullscreen modal dialog showing an enlarged preview
+  /// of the specified image.
+  ///
+  /// [imagePath] Path to the image asset.
+  /// [title] Display title shown in the modal header overlay.
   void _showImagePreview(String imagePath, String title) {
     showDialog(
       context: context,
@@ -79,11 +106,10 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 64,
-                    ),
+                    errorBuilder: (c, e, s) {
+                      debugPrint('Articles image preview load error: $e');
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ),
               ),
@@ -191,7 +217,8 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
-  // --- 1. HERO SECTION ---
+  /// Builds the hero banner section including breadcrumb navigation,
+  /// main heading, overview text, and statistical metrics.
   Widget _buildHeroSection(bool isDesktop) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -206,9 +233,11 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
           const SectionLabel(text: "CANONICAL WISDOM & RESEARCH"),
           const SizedBox(height: 24),
           Text(
-            'Eternal Revelations, Explicated for the\nModern Seeker.',
+            'Eternal Revelations, Explicated for the Modern Seeker.',
             style: AppTextStyles.heroHeading.copyWith(
-              fontSize: isDesktop ? 54 : 36,
+              fontSize: isDesktop
+                  ? 54
+                  : (MediaQuery.of(context).size.width < 400 ? 28 : 36),
               height: 1.1,
             ),
           ),
@@ -227,6 +256,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
+  /// Builds the top breadcrumb navigation trail (Home > Articles).
   Widget _buildBreadcrumbs() {
     return Row(
       children: [
@@ -246,6 +276,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
+  /// Builds statistical summary cards displayed in the hero section.
   Widget _buildHeroStats(bool isDesktop) {
     final stats = [
       {"icon": Icons.menu_book, "value": "720+", "label": "Scholarly Works"},
@@ -258,12 +289,17 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
       {"icon": Icons.public, "value": "Open", "label": "Access Library"},
     ];
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = isDesktop
+        ? 220.0
+        : (screenWidth < 400 ? double.infinity : (screenWidth - 64) / 2);
+
     return Wrap(
       spacing: 24,
       runSpacing: 24,
       children: stats.map((s) {
         return Container(
-          width: isDesktop ? 220 : (MediaQuery.of(context).size.width - 60) / 2,
+          width: itemWidth,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: const Color(0xFFF9F6F1),
@@ -299,7 +335,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
-  // --- 2. SEARCH SECTION ---
+  /// Builds the search input field and horizontal category selection chips.
   Widget _buildSearchSection(bool isDesktop) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
@@ -372,7 +408,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
-  // Common decoration for search text field to maintain consistency.
+  /// Returns standard [InputDecoration] for the article search text field.
   InputDecoration _searchDecoration() {
     return InputDecoration(
       hintText:
@@ -392,7 +428,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
-  // Unified search button widget to handle responsive behavior.
+  /// Returns the search action button widget with responsive styling.
   Widget _searchButton() {
     return AppButton(
       text: "Search Library",
@@ -412,6 +448,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
+  /// Builds the featured study banner displaying a highlighted article card.
   Widget _buildFeaturedArticle(bool isDesktop, ArticleItem art) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
@@ -440,6 +477,14 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                             child: Image.asset(
                               "assets/image_3.png",
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                debugPrint(
+                                  'Featured article image error: $error',
+                                );
+                                return Container(
+                                  color: const Color(0xFF2C1B10),
+                                );
+                              },
                             ),
                           ),
                         ),
@@ -459,6 +504,12 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                           child: Image.asset(
                             "assets/image_3.png",
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              debugPrint(
+                                'Featured article mobile image error: $error',
+                              );
+                              return Container(color: const Color(0xFF2C1B10));
+                            },
                           ),
                         ),
                       ),
@@ -471,14 +522,20 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
+  /// Builds the text content inside the featured article card including category,
+  /// metadata, title, excerpt, and author details.
   Widget _buildFeaturedContent(ArticleItem art) {
+    final bool isDesktop = MediaQuery.of(context).size.width >= 1100;
     return Padding(
-      padding: const EdgeInsets.all(48),
+      padding: EdgeInsets.all(isDesktop ? 48 : 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -497,41 +554,49 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 24),
-              const Icon(Icons.access_time, size: 16, color: Colors.black45),
-              const SizedBox(width: 6),
-              const Text(
-                "12 Min Read",
-                style: TextStyle(fontSize: 13, color: Colors.black45),
+              const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.access_time, size: 16, color: Colors.black45),
+                  SizedBox(width: 6),
+                  Text(
+                    "12 Min Read",
+                    style: TextStyle(fontSize: 13, color: Colors.black45),
+                  ),
+                ],
               ),
-              const SizedBox(width: 24),
-              const Icon(Icons.calendar_today, size: 14, color: Colors.black45),
-              const SizedBox(width: 6),
-              const Text(
-                "Published: Jan 2024",
-                style: TextStyle(fontSize: 13, color: Colors.black45),
+              const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.calendar_today, size: 14, color: Colors.black45),
+                  SizedBox(width: 6),
+                  Text(
+                    "Published: Jan 2024",
+                    style: TextStyle(fontSize: 13, color: Colors.black45),
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
           Text(
             art.title,
             style: AppTextStyles.heading2.copyWith(
               fontFamily: 'Georgia',
-              fontSize: 36,
+              fontSize: isDesktop ? 36 : 24,
               height: 1.2,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Text(
             art.excerpt,
             style: AppTextStyles.bodyLarge.copyWith(
-              fontSize: 16,
+              fontSize: isDesktop ? 16 : 14,
               height: 1.6,
               color: Colors.black54,
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 32),
           Row(
             children: [
               const CircleAvatar(
@@ -540,25 +605,31 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
                 child: Icon(Icons.person, size: 24, color: AppColor.primary),
               ),
               const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Authored by ${art.author}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Authored by ${art.author}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
-                  ),
-                  const Text(
-                    "Canonical Research Scholar | PhD",
-                    style: TextStyle(fontSize: 13, color: Colors.black54),
-                  ),
-                ],
+                    const Text(
+                      "Canonical Research Scholar | PhD",
+                      style: TextStyle(fontSize: 13, color: Colors.black54),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 48),
+          const SizedBox(height: 32),
           AppButton(
             text: "Read Full Dissertation",
             onPressed: () => setState(() => _activeArticle = art),
@@ -569,7 +640,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
-  // --- 4. DISSERTATIONS GRID ---
+  /// Builds a responsive grid of canonical dissertation cards matching search and category criteria.
   Widget _buildDissertationsSection(
     bool isDesktop,
     List<ArticleItem> articles,
@@ -681,7 +752,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
-  // --- 5. RELATED DISCOURSES ---
+  /// Builds the related canonical discourses section showcasing recommended articles.
   Widget _buildRelatedDiscourses(bool isDesktop, ArticleProvider provider) {
     return Container(
       width: double.infinity,
@@ -766,7 +837,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
-  // --- 6. NEWSLETTER SECTION ---
+  /// Builds the "Sadhanā Digest" email subscription form section.
   Widget _buildNewsletterSection(bool isDesktop) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
@@ -899,7 +970,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
-  // --- 7. VEDIC FOOTER TEXTS ---
+  /// Builds the traditional Vedic peace chants and Sanskrit verse footer text.
   Widget _buildVedicFooterText() {
     return Column(
       children: [
@@ -928,6 +999,10 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
+  /// Builds the detailed view layout for a selected [ArticleItem].
+  ///
+  /// Shows back navigation, article category, title, author details,
+  /// full content text, research tags, and demo SEO metadata.
   Widget _buildArticleDetail(ArticleItem art) {
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
