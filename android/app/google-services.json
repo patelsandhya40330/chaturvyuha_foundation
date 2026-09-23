@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1042537177373",
+    "project_id": "chaturvyuha-foundation-afcde",
+    "storage_bucket": "chaturvyuha-foundation-afcde.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042537177373:android:f1c7c2afc7a7caa77b01f4",
+        "android_client_info": {
+          "package_name": "com.example.chaturvyuha_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANnai5XA8byC1en6Eo00N_N5LeuaZPTOg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042537177373:android:1ad9be3602af3a0c7b01f4",
+        "android_client_info": {
+          "package_name": "com.example.chaturvyuha_foundation"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANnai5XA8byC1en6Eo00N_N5LeuaZPTOg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
