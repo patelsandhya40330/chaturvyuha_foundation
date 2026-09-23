@@ -5,8 +5,7 @@ import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
 import 'package:chaturvyuha_foundation/Widgats/section_label.dart';
 import 'package:chaturvyuha_foundation/Widgats/app_footer.dart';
 import 'package:chaturvyuha_foundation/Widgats/app_button.dart';
-
-import '../../Widgats/app_card_container.dart';
+import 'package:chaturvyuha_foundation/Widgats/app_card_container.dart';
 
 class HomeScreen extends StatefulWidget {
   final ValueChanged<int>? onTabSelected;
@@ -32,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _showWelcomePopup();
     });
   }
@@ -62,37 +62,37 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: Column(
                     children: [
-                      // 1. HERO SECTION (Existing)
+                      // 1. HERO SECTION
                       _buildHeroSection(isDesktop),
 
                       const SizedBox(height: 100),
 
-                      // 2. FOUR SACRED GATEWAYS - Grid of 4 portals
+                      // 2. FOUR SACRED GATEWAYS
                       _buildGatewaysSection(isDesktop),
 
                       const SizedBox(height: 100),
 
-                      // 3. FEATURED PRACTICE & DAILY REGIMEN - Practice details + Audio player mockup
+                      // 3. FEATURED PRACTICE & DAILY REGIMEN
                       _buildPracticesSection(isDesktop),
 
                       const SizedBox(height: 100),
 
-                      // 4. SANSKRIT INTENSIVE BANNER - Call to action for enrollment
+                      // 4. SANSKRIT INTENSIVE BANNER
                       _buildSanskritBanner(isDesktop),
 
                       const SizedBox(height: 100),
 
-                      // 5. LIVING MOMENTS OF SADHANA - Visual gallery with overlays
+                      // 5. LIVING MOMENTS OF SADHANA (GALLERY)
                       _buildSadhanaGallery(isDesktop),
 
                       const SizedBox(height: 100),
 
-                      // 6. WEEKLY CONTEMPLATIVE DARSHAN - Newsletter subscription section
+                      // 6. WEEKLY CONTEMPLATIVE DARSHAN (NEWSLETTER)
                       _buildNewsletterSection(isDesktop),
                     ],
                   ),
                 ),
-                // 7. COMPREHENSIVE FOOTER - Links and copyright
+                // 7. COMPREHENSIVE FOOTER
                 _buildFooter(isDesktop),
               ],
             ),
@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- 1. HERO SECTION (Already implemented) ---
+  // --- 1. HERO SECTION ---
   Widget _buildHeroSection(bool isDesktop) {
     if (isDesktop) {
       return Row(
@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Expanded(flex: 6, child: _buildHeroLeftContent()),
           const SizedBox(width: 60),
-          Expanded(flex: 4, child: _buildHeroRightCard()),
+          Expanded(flex: 4, child: _buildHeroRightCard(isDesktop)),
         ],
       );
     }
@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildHeroLeftContent(),
         const SizedBox(height: 40),
-        _buildHeroRightCard(),
+        _buildHeroRightCard(isDesktop),
       ],
     );
   }
@@ -142,17 +142,17 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 48),
         AppButton(
           text: "Become a Member",
-          onPressed: () => widget.onTabSelected?.call(9),
+          onPressed: () => widget.onTabSelected?.call(8),
           isPrimary: true,
         ),
       ],
     );
   }
 
-  Widget _buildHeroRightCard() {
+  Widget _buildHeroRightCard(bool isDesktop) {
     return AppCardContainer(
       width: double.infinity,
-      height: 450,
+      height: isDesktop ? 450 : 320, // Responsive height for hero card
       backgroundColor: const Color(0xFFF9F6F1),
       borderRadius: 32,
       borderColor: null,
@@ -197,48 +197,45 @@ class _HomeScreenState extends State<HomeScreen> {
           style: AppTextStyles.body,
         ),
         const SizedBox(height: 48),
-        // Flexible grid: Adjusts columns and height to prevent content overflow.
+        // Wrap layout for responsive Gateway Cards without rigid GridView heights
         LayoutBuilder(
           builder: (context, constraints) {
             final double width = constraints.maxWidth;
-            final int crossAxisCount = isDesktop ? 4 : (width > 700 ? 2 : 1);
+            final int crossAxisCount = isDesktop ? 4 : (width > 650 ? 2 : 1);
+            final double cardWidth =
+                (width - (crossAxisCount - 1) * 24) / crossAxisCount;
 
-            // Calculate a dynamic height based on content or use Wrap to avoid rigid GridView aspect ratios.
             return Wrap(
               spacing: 24,
               runSpacing: 24,
               children: [
-                _gatewayItem(
+                _gatewayCard(
                   "Dharma & Sanskriti",
                   "Philosophy and Language",
                   Icons.menu_book,
-                  4,
-                  width,
-                  crossAxisCount,
+                  3,
+                  cardWidth,
                 ),
-                _gatewayItem(
+                _gatewayCard(
                   "Yoga & Meditation",
                   "Mindfulness and Practice",
                   Icons.self_improvement,
                   2,
-                  width,
-                  crossAxisCount,
+                  cardWidth,
                 ),
-                _gatewayItem(
+                _gatewayCard(
                   "Vedic Education",
                   "Structured Learning",
                   Icons.school,
-                  3,
-                  width,
-                  crossAxisCount,
+                  1,
+                  cardWidth,
                 ),
-                _gatewayItem(
+                _gatewayCard(
                   "Media & Archives",
                   "Preserving Heritage",
                   Icons.collections,
-                  7,
-                  width,
-                  crossAxisCount,
+                  6,
+                  cardWidth,
                 ),
               ],
             );
@@ -248,33 +245,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Individual gateway item with calculated width to fit the row.
-  Widget _gatewayItem(
+  Widget _gatewayCard(
     String title,
     String desc,
     IconData icon,
     int pageIndex,
-    double totalWidth,
-    int count,
+    double width,
   ) {
-    final double itemWidth = (totalWidth - (count - 1) * 24) / count;
-    return SizedBox(
-      width: itemWidth,
-      height:
-          320, // Provides a bounded height so Spacer() in _gatewayCard can work.
-      child: _gatewayCard(title, desc, icon, pageIndex),
-    );
-  }
-
-  Widget _gatewayCard(String title, String desc, IconData icon, int pageIndex) {
     return AppCardContainer(
-      padding: const EdgeInsets.all(32),
+      width: width,
+      padding: const EdgeInsets.all(28),
       borderRadius: 24,
       onTap: () => widget.onTabSelected?.call(pageIndex),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Icon box matching the design
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -283,21 +269,31 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: Icon(icon, color: AppColor.primary, size: 24),
           ),
+          const SizedBox(height: 20),
+          Text(
+            title,
+            style: AppTextStyles.title.copyWith(fontSize: 18),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+          const SizedBox(height: 10),
+          Text(
+            desc,
+            style: AppTextStyles.bodySmall,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
           const SizedBox(height: 24),
-          Text(title, style: AppTextStyles.title.copyWith(fontSize: 18)),
-          const SizedBox(height: 12),
-          Text(desc, style: AppTextStyles.bodySmall),
-          const Spacer(),
           const Text("Enter Portal →", style: AppTextStyles.link),
         ],
       ),
     );
   }
 
+  // --- 3. PRACTICES SECTION ---
   Widget _buildPracticesSection(bool isDesktop) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Stack sections vertically if the available width is too narrow for side-by-side display.
         if (constraints.maxWidth < 1000) {
           return Column(
             children: [
@@ -319,10 +315,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Large practice card with audio mockup
   Widget _buildFeaturedPractice() {
     return AppCardContainer(
-      padding: const EdgeInsets.all(40),
+      padding: const EdgeInsets.all(32),
       borderRadius: 32,
       backgroundColor: AppColor.cardBg,
       borderColor: null,
@@ -341,9 +336,8 @@ class _HomeScreenState extends State<HomeScreen> {
             style: AppTextStyles.body,
           ),
           const SizedBox(height: 40),
-          // Audio mockup container
           AppCardContainer(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20),
             borderRadius: 20,
             borderColor: null,
             child: Row(
@@ -353,7 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   radius: 24,
                   child: Icon(Icons.play_arrow, color: Colors.white),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -361,9 +355,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Text(
                         "Guided Audio Tutorial",
                         style: TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                       const SizedBox(height: 8),
-                      // Progress bar mockup
                       Row(
                         children: [
                           Expanded(
@@ -390,7 +385,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Vertical list of regimen items
   Widget _buildDailyRegimen() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,8 +432,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   title,
                   style: const TextStyle(fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
-                Text(desc, style: AppTextStyles.bodySmall),
+                Text(
+                  desc,
+                  style: AppTextStyles.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
               ],
             ),
           ),
@@ -452,9 +453,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSanskritBanner(bool isDesktop) {
     return AppCardContainer(
       width: double.infinity,
-      padding: EdgeInsets.all(isDesktop ? 60 : 32),
+      padding: EdgeInsets.all(isDesktop ? 60 : 28),
       borderRadius: 32,
-      backgroundColor: const Color(0xFF2C1B10), // Deep brand brown
+      backgroundColor: const Color(0xFF2C1B10),
       borderColor: null,
       child: Column(
         children: [
@@ -467,7 +468,7 @@ class _HomeScreenState extends State<HomeScreen> {
             "Paninian Sanskrit Grammar & Vedic Chanting Intensive",
             style: TextStyle(
               color: Colors.white,
-              fontSize: isDesktop ? 36 : 24,
+              fontSize: isDesktop ? 36 : 22,
               fontWeight: FontWeight.bold,
               fontFamily: 'Georgia',
             ),
@@ -485,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 40),
           AppButton(
             text: "Apply For Fellowship",
-            onPressed: () {},
+            onPressed: () => widget.onTabSelected?.call(8),
             isPrimary: true,
           ),
         ],
@@ -493,6 +494,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // --- 5. VISUAL SANCTUARY (GALLERY) ---
   Widget _buildSadhanaGallery(bool isDesktop) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,7 +523,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 if (isDesktop && !isNarrow)
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () => widget.onTabSelected?.call(6),
                     child: const Text(
                       "View Complete Gallery →",
                       style: AppTextStyles.link,
@@ -534,7 +536,6 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 48),
         LayoutBuilder(
           builder: (context, constraints) {
-            // Stack gallery items if there is not enough room for side-by-side layout.
             if (constraints.maxWidth < 900) {
               return Column(
                 children: [
@@ -575,12 +576,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _galleryCard(String title, String imagePath) {
     return AppCardContainer(
-      height: 400,
+      height: 350,
       borderRadius: 24,
       borderColor: null,
+      onTap: () => widget.onTabSelected?.call(6),
       image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
       child: Container(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
@@ -597,10 +599,12 @@ class _HomeScreenState extends State<HomeScreen> {
               title,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Georgia',
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
             ),
           ],
         ),
@@ -611,7 +615,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // --- 6. NEWSLETTER SUBSCRIPTION ---
   Widget _buildNewsletterSection(bool isDesktop) {
     return AppCardContainer(
-      padding: EdgeInsets.all(isDesktop ? 60 : 32),
+      padding: EdgeInsets.all(isDesktop ? 60 : 28),
       borderRadius: 32,
       child: Column(
         children: [
@@ -620,6 +624,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const Text(
             "Weekly Contemplative Darshan",
             style: AppTextStyles.heading2,
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           const Text(
@@ -632,7 +637,6 @@ class _HomeScreenState extends State<HomeScreen> {
             constraints: const BoxConstraints(maxWidth: 600),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // Stack vertically on narrow screens to prevent horizontal overflow.
                 if (constraints.maxWidth < 450) {
                   return Column(
                     children: [
@@ -656,7 +660,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: double.infinity,
                         child: AppButton(
                           text: "Subscribe",
-                          onPressed: () {},
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Subscribed to Weekly Contemplative Darshan!',
+                                ),
+                              ),
+                            );
+                          },
                           isPrimary: true,
                         ),
                       ),
@@ -685,7 +697,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(width: 16),
                     AppButton(
                       text: "Subscribe",
-                      onPressed: () {},
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Subscribed to Weekly Contemplative Darshan!',
+                            ),
+                          ),
+                        );
+                      },
                       isPrimary: true,
                     ),
                   ],
@@ -729,19 +749,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.all(32.0),
+                      padding: const EdgeInsets.all(28.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 8),
 
-                          // Top Label
-                          const SizedBox(height: 8),
                           const Text(
                             "Begin Your Contemplative Journey into the Vedas",
                             style: TextStyle(
-                              fontSize: 32,
+                              fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF1A1A1A),
                               fontFamily: 'Georgia',
@@ -752,12 +770,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             "Preserving 3,000+ years of primordial oral transmission, sacred phonetics, and Vedic wisdom translated for daily mindful living.",
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 14,
                               color: Colors.black.withAlpha(160),
                               height: 1.5,
                             ),
                           ),
-                          const SizedBox(height: 28),
+                          const SizedBox(height: 24),
                           _buildPopupItem(
                             icon: Icons.waves,
                             title: "Daily Prātah Sādhana",
@@ -778,10 +796,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             subtitle:
                                 "Receive fortnightly Sandhya Patrika & lunar transit contemplations.",
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 28),
                           LayoutBuilder(
                             builder: (context, constraints) {
-                              // Stack vertically on narrow viewports or large text scales.
                               if (constraints.maxWidth < 400) {
                                 return Column(
                                   children: [
