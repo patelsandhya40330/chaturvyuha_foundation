@@ -306,55 +306,34 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  onChanged: (val) => setState(() => _searchQuery = val),
-                  decoration: InputDecoration(
-                    hintText:
-                        'Search articles by title, manuscript keywords, lineage authors...',
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: AppColor.primary,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Stack search bar components on mobile to prevent horizontal overflow.
+              if (constraints.maxWidth < 600) {
+                return Column(
+                  children: [
+                    TextField(
+                      onChanged: (val) => setState(() => _searchQuery = val),
+                      decoration: _searchDecoration(),
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.all(20),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColor.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColor.border),
+                    const SizedBox(height: 16),
+                    SizedBox(width: double.infinity, child: _searchButton()),
+                  ],
+                );
+              }
+              return Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      onChanged: (val) => setState(() => _searchQuery = val),
+                      decoration: _searchDecoration(),
                     ),
                   ),
-                ),
-              ),
-              if (isDesktop) ...[
-                const SizedBox(width: 16),
-                AppButton(
-                  text: "Search Library",
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          _searchQuery.isEmpty
-                              ? 'Showing all library articles'
-                              : 'Filtered articles by "$_searchQuery"',
-                        ),
-                      ),
-                    );
-                  },
-                  isPrimary: true,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 20,
-                  ),
-                ),
-              ],
-            ],
+                  const SizedBox(width: 16),
+                  _searchButton(),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 32),
           SingleChildScrollView(
@@ -393,7 +372,46 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
     );
   }
 
-  // --- 3. FEATURED ARTICLE ---
+  // Common decoration for search text field to maintain consistency.
+  InputDecoration _searchDecoration() {
+    return InputDecoration(
+      hintText:
+          'Search articles by title, manuscript keywords, lineage authors...',
+      prefixIcon: const Icon(Icons.search, color: AppColor.primary),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.all(20),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColor.border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColor.border),
+      ),
+    );
+  }
+
+  // Unified search button widget to handle responsive behavior.
+  Widget _searchButton() {
+    return AppButton(
+      text: "Search Library",
+      onPressed: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _searchQuery.isEmpty
+                  ? 'Showing all library articles'
+                  : 'Filtered articles by "$_searchQuery"',
+            ),
+          ),
+        );
+      },
+      isPrimary: true,
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+    );
+  }
+
   Widget _buildFeaturedArticle(bool isDesktop, ArticleItem art) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),

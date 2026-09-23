@@ -152,7 +152,12 @@ class AppFooter extends StatelessWidget {
                   color: AppColor.lightPrimary,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.spa, color: AppColor.primary, size: 28),
+                child: Image.asset(
+                  "assets/chaturvedal-logo.png",
+                  height: 28,
+                  width: 28,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(width: 12),

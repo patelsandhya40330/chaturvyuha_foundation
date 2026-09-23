@@ -3,6 +3,9 @@ import '../models/team_member.dart';
 import '../models/event_item.dart';
 import '../models/media_item.dart';
 
+import '../models/course_item.dart';
+import '../models/article_item.dart';
+
 class FoundationProvider extends ChangeNotifier {
   // Demo/Sample Data Flag Indicator
   final bool isDemoData = true;
@@ -81,7 +84,142 @@ class FoundationProvider extends ChangeNotifier {
     },
   ];
 
-  // 3. Events & Programs Data
+  // 3. Vedic Education Sample Data
+  final List<Map<String, String>> vedangas = [
+    {
+      "title": "Shiksha",
+      "desc": "Phonetics and pronunciation of Vedic hymns.",
+      "icon": "vocal_icon",
+    },
+    {
+      "title": "Chandas",
+      "desc": "Vedic prosody and poetic meters.",
+      "icon": "meter_icon",
+    },
+    {
+      "title": "Vyakarana",
+      "desc": "Sanskrit grammar and linguistic analysis.",
+      "icon": "grammar_icon",
+    },
+    {
+      "title": "Nirukta",
+      "desc": "Etymology and interpretation of words.",
+      "icon": "etymology_icon",
+    },
+    {
+      "title": "Jyotisha",
+      "desc": "Vedic astronomy and time-keeping.",
+      "icon": "astronomy_icon",
+    },
+    {
+      "title": "Kalpa",
+      "desc": "Ritual instructions and social ethics.",
+      "icon": "ritual_icon",
+    },
+  ];
+
+  final List<CourseItem> courses = [
+    CourseItem(
+      title: "Foundations of Upanishadic Wisdom",
+      description:
+          "An intensive introductory look into structural dialogues covering reality, consciousness, and freedom.",
+      duration: "8 Weeks",
+      schedule: "Sundays (8:00 AM - 10:00 AM)",
+      instructor: "Acharya Shridhar Sharma",
+      resources: ["Introduction to Upanishads PDF", "Weekly Audio Chant Guide"],
+      topics: [
+        "Nature of Consciousness",
+        "The Concept of Self",
+        "Karma and Freedom",
+      ],
+    ),
+    CourseItem(
+      title: "Sanskrit Grammar for Beginners",
+      description:
+          "Learn foundational phonetics, declensions, rules of conjugation, and conversational expressions.",
+      duration: "12 Weeks",
+      schedule: "Saturdays (10:00 AM - 12:00 PM)",
+      instructor: "Acharya Shridhar Sharma",
+      resources: ["Sanskrit Primer Workbook", "Audio Pronunciation Dictionary"],
+      topics: [
+        "Sanskrit Vowels & Consonants",
+        "Noun Cases & Inflections",
+        "Simple Sentence Creation",
+      ],
+    ),
+    CourseItem(
+      title: "Vedic Phonetics & Svara Patha",
+      description:
+          "Advanced training in the precise tonal recitation of the Rigveda Samhita.",
+      duration: "6 Months",
+      schedule: "Daily (5:00 AM - 7:00 AM)",
+      instructor: "Acharya Devavrata Shastri",
+      resources: ["Rigveda Svara Manual", "Phonetic Analysis Software"],
+      topics: ["Udātta & Anudātta", "Svarita Variations", "Breath Modulation"],
+    ),
+  ];
+
+  final List<Map<String, dynamic>> cohortSchedule = [
+    {
+      "course": "Vedic Philosophy 101",
+      "start": "April 15, 2024",
+      "seats": "12 Left",
+      "status": "ENROLLING",
+    },
+    {
+      "course": "Sanskrit Level 1",
+      "start": "May 01, 2024",
+      "seats": "05 Left",
+      "status": "LAST CALL",
+    },
+    {
+      "course": "Rigveda Phonetics",
+      "start": "June 10, 2024",
+      "seats": "20 Left",
+      "status": "OPEN",
+    },
+  ];
+
+  final List<ArticleItem> articles = [
+    ArticleItem(
+      id: "art-1",
+      title: "The Role of Mindful Pauses in Modern Routines",
+      excerpt:
+          "How inserting brief moments of quiet reflection can dramatically alleviate workplace stress and clear cognitive overload.",
+      content:
+          "Vedic philosophy teaches that deep, unshakeable peace is not a distant goal, but our intrinsic baseline state. By deliberately structuring short, regular pauses during highly intense daily routines, we decouple our focus from continuous outward stimuli and reconnect with inner stability...",
+      category: "Wellness",
+      tags: ["Mindfulness", "Meditation", "Vedic living"],
+      author: "Dr. Ananya Mishra",
+      publishedDate: DateTime(2024, 1, 10),
+      updatedDate: DateTime(2024, 1, 12),
+      relatedArticleIds: ["art-2"],
+      seoTitle: "Mindful Pauses in Modern Routines | Chaturvyuha Wisdom",
+      seoDescription:
+          "Learn how ancient Vedic mindfulness intervals help resolve modern daily cognitive pressure.",
+      seoKeywords: "mindfulness, stress relief, vedic psychology, self care",
+    ),
+    ArticleItem(
+      id: "art-2",
+      title: "Sanskrit: Sound Vibrations and Brain Plasticity",
+      excerpt:
+          "Exploring modern neuroscientific discoveries validating the benefits of structured vocal chanting.",
+      content:
+          "Chanting sacred Sanskrit verses systematically exercises neural networks, improving overall memory retention and auditory focus. This article highlights recent scientific studies analyzing how precise phonetics shapes neuroplastic development over time...",
+      category: "Language",
+      tags: ["Sanskrit", "Neuroscience", "Chanting"],
+      author: "Acharya Shridhar Sharma",
+      publishedDate: DateTime(2024, 2, 5),
+      updatedDate: DateTime(2024, 2, 5),
+      relatedArticleIds: ["art-1"],
+      seoTitle: "Sanskrit Chanting and Brain Plasticity | Research",
+      seoDescription:
+          "Neuroscientific exploration of vocal vibration benefits on cognitive clarity.",
+      seoKeywords: "sanskrit, chanting, brain health, cognitive plasticity",
+    ),
+  ];
+
+  // 4. Events & Programs Data
   final List<EventItem> events = [
     EventItem(
       title: "Global Peace Chant Gathering",

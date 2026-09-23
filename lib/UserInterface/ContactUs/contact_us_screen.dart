@@ -246,22 +246,28 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   Widget _buildInquiryAndSidebar(bool isDesktop, double maxWidth) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
-      child: isDesktop
-          ? Row(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Use Row only when there's enough horizontal space to avoid crowding content.
+          if (constraints.maxWidth >= 1000) {
+            return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(flex: 6, child: _buildContactForm()),
-                const SizedBox(width: 60),
+                const SizedBox(width: 48),
                 Expanded(flex: 4, child: _buildContactSidebar()),
               ],
-            )
-          : Column(
-              children: [
-                _buildContactForm(),
-                const SizedBox(height: 60),
-                _buildContactSidebar(),
-              ],
-            ),
+            );
+          }
+          return Column(
+            children: [
+              _buildContactForm(),
+              const SizedBox(height: 60),
+              _buildContactSidebar(),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -632,6 +638,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                 Text(
                   label,
                   style: AppTextStyles.bulletLabel.copyWith(fontSize: 9),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(

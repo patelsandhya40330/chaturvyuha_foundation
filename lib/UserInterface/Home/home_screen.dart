@@ -197,49 +197,72 @@ class _HomeScreenState extends State<HomeScreen> {
           style: AppTextStyles.body,
         ),
         const SizedBox(height: 48),
-        // Flexible grid: 4 columns on desktop, responsive on mobile
+        // Flexible grid: Adjusts columns and height to prevent content overflow.
         LayoutBuilder(
           builder: (context, constraints) {
-            int crossAxisCount = isDesktop
-                ? 4
-                : (constraints.maxWidth > 600 ? 2 : 1);
-            return GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: crossAxisCount,
-              childAspectRatio: isDesktop ? 0.75 : 1.2,
-              mainAxisSpacing: 24,
-              crossAxisSpacing: 24,
+            final double width = constraints.maxWidth;
+            final int crossAxisCount = isDesktop ? 4 : (width > 700 ? 2 : 1);
+
+            // Calculate a dynamic height based on content or use Wrap to avoid rigid GridView aspect ratios.
+            return Wrap(
+              spacing: 24,
+              runSpacing: 24,
               children: [
-                _gatewayCard(
+                _gatewayItem(
                   "Dharma & Sanskriti",
                   "Philosophy and Language",
                   Icons.menu_book,
                   4,
+                  width,
+                  crossAxisCount,
                 ),
-                _gatewayCard(
+                _gatewayItem(
                   "Yoga & Meditation",
                   "Mindfulness and Practice",
                   Icons.self_improvement,
                   2,
+                  width,
+                  crossAxisCount,
                 ),
-                _gatewayCard(
+                _gatewayItem(
                   "Vedic Education",
                   "Structured Learning",
                   Icons.school,
                   3,
+                  width,
+                  crossAxisCount,
                 ),
-                _gatewayCard(
+                _gatewayItem(
                   "Media & Archives",
                   "Preserving Heritage",
                   Icons.collections,
                   7,
+                  width,
+                  crossAxisCount,
                 ),
               ],
             );
           },
         ),
       ],
+    );
+  }
+
+  // Individual gateway item with calculated width to fit the row.
+  Widget _gatewayItem(
+    String title,
+    String desc,
+    IconData icon,
+    int pageIndex,
+    double totalWidth,
+    int count,
+  ) {
+    final double itemWidth = (totalWidth - (count - 1) * 24) / count;
+    return SizedBox(
+      width: itemWidth,
+      height:
+          320, // Provides a bounded height so Spacer() in _gatewayCard can work.
+      child: _gatewayCard(title, desc, icon, pageIndex),
     );
   }
 
@@ -271,24 +294,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- 3. PRACTICES SECTION (FEATURED + REGIMEN) ---
   Widget _buildPracticesSection(bool isDesktop) {
-    if (isDesktop) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(flex: 6, child: _buildFeaturedPractice()),
-          const SizedBox(width: 48),
-          Expanded(flex: 4, child: _buildDailyRegimen()),
-        ],
-      );
-    }
-    return Column(
-      children: [
-        _buildFeaturedPractice(),
-        const SizedBox(height: 48),
-        _buildDailyRegimen(),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Stack sections vertically if the available width is too narrow for side-by-side display.
+        if (constraints.maxWidth < 1000) {
+          return Column(
+            children: [
+              _buildFeaturedPractice(),
+              const SizedBox(height: 48),
+              _buildDailyRegimen(),
+            ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(flex: 6, child: _buildFeaturedPractice()),
+            const SizedBox(width: 48),
+            Expanded(flex: 4, child: _buildDailyRegimen()),
+          ],
+        );
+      },
     );
   }
 
@@ -466,68 +493,82 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // --- 5. VISUAL SANCTUARY (GALLERY) ---
   Widget _buildSadhanaGallery(bool isDesktop) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final bool isNarrow = constraints.maxWidth < 600;
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: isNarrow
+                  ? CrossAxisAlignment.start
+                  : CrossAxisAlignment.center,
               children: [
-                _buildSectionLabelWithDot("VISUAL SANCTUARY"),
-                const SizedBox(height: 16),
-                const Text(
-                  "Living Moments of Sadhana",
-                  style: AppTextStyles.heading2,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionLabelWithDot("VISUAL SANCTUARY"),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Living Moments of Sadhana",
+                        style: AppTextStyles.heading2,
+                      ),
+                    ],
+                  ),
                 ),
+                if (isDesktop && !isNarrow)
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      "View Complete Gallery →",
+                      style: AppTextStyles.link,
+                    ),
+                  ),
               ],
-            ),
-            if (isDesktop)
-              TextButton(
-                onPressed: () {},
-                child: const Text(
-                  "View Complete Gallery →",
-                  style: AppTextStyles.link,
-                ),
-              ),
-          ],
+            );
+          },
         ),
         const SizedBox(height: 48),
-        if (isDesktop)
-          Row(
-            children: [
-              Expanded(
-                child: _galleryCard(
-                  "Brahma Muhurta Aarti at Triveni Ghat",
-                  "assets/image_1.png",
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // Stack gallery items if there is not enough room for side-by-side layout.
+            if (constraints.maxWidth < 900) {
+              return Column(
+                children: [
+                  _galleryCard(
+                    "Brahma Muhurta Aarti at Triveni Ghat",
+                    "assets/image_1.png",
+                  ),
+                  const SizedBox(height: 24),
+                  _galleryCard(
+                    "Grantha Codices & Japa Sadhana",
+                    "assets/image_2.png",
+                  ),
+                ],
+              );
+            }
+            return Row(
+              children: [
+                Expanded(
+                  child: _galleryCard(
+                    "Brahma Muhurta Aarti at Triveni Ghat",
+                    "assets/image_1.png",
+                  ),
                 ),
-              ),
-              const SizedBox(width: 24),
-              Expanded(
-                child: _galleryCard(
-                  "Grantha Codices & Japa Sadhana",
-                  "assets/image_2.png",
+                const SizedBox(width: 24),
+                Expanded(
+                  child: _galleryCard(
+                    "Grantha Codices & Japa Sadhana",
+                    "assets/image_2.png",
+                  ),
                 ),
-              ),
-            ],
-          )
-        else
-          Column(
-            children: [
-              _galleryCard(
-                "Brahma Muhurta Aarti at Triveni Ghat",
-                "assets/image_1.png",
-              ),
-              const SizedBox(height: 24),
-              _galleryCard(
-                "Grantha Codices & Japa Sadhana",
-                "assets/image_2.png",
-              ),
-            ],
-          ),
+              ],
+            );
+          },
+        ),
       ],
     );
   }
@@ -589,28 +630,67 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 40),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Enter Your Email",
-                      filled: true,
-                      fillColor: AppColor.backgroundColor,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // Stack vertically on narrow screens to prevent horizontal overflow.
+                if (constraints.maxWidth < 450) {
+                  return Column(
+                    children: [
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: "Enter Your Email",
+                          filled: true,
+                          fillColor: AppColor.backgroundColor,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                        ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: AppButton(
+                          text: "Subscribe",
+                          onPressed: () {},
+                          isPrimary: true,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: "Enter Your Email",
+                          filled: true,
+                          fillColor: AppColor.backgroundColor,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                AppButton(text: "Subscribe", onPressed: () {}, isPrimary: true),
-              ],
+                    const SizedBox(width: 16),
+                    AppButton(
+                      text: "Subscribe",
+                      onPressed: () {},
+                      isPrimary: true,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -701,99 +781,87 @@ class _HomeScreenState extends State<HomeScreen> {
                                 "Receive fortnightly Sandhya Patrika & lunar transit contemplations.",
                           ),
                           const SizedBox(height: 32),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Enter your email address",
-                                    hintStyle: TextStyle(
-                                      color: Colors.black.withAlpha(80),
-                                      fontSize: 14,
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      borderSide: BorderSide(
-                                        color: Colors.black.withAlpha(20),
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              // Stack vertically on narrow viewports or large text scales.
+                              if (constraints.maxWidth < 400) {
+                                return Column(
+                                  children: [
+                                    TextField(
+                                      decoration: InputDecoration(
+                                        hintText: "Enter your email address",
+                                        hintStyle: TextStyle(
+                                          color: Colors.black.withAlpha(80),
+                                          fontSize: 14,
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            30,
+                                          ),
+                                          borderSide: BorderSide(
+                                            color: Colors.black.withAlpha(20),
+                                          ),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                              vertical: 16,
+                                            ),
                                       ),
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 16,
+                                    const SizedBox(height: 12),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: AppButton(
+                                        text: "Book My Spot",
+                                        onPressed: () => Navigator.pop(context),
+                                        borderRadius: 30,
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              AppButton(
-                                text: "Book My Spot",
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 20,
-                                ),
-                                borderRadius: 30,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Explore as Guest • Remind me later",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black.withAlpha(120),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              Row(
+                                  ],
+                                );
+                              }
+                              return Row(
                                 children: [
-                                  const Icon(
-                                    Icons.auto_awesome,
-                                    size: 14,
-                                    color: Color(0xFFD4AF37),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    "Free digital handbook included",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.black.withAlpha(120),
+                                  Expanded(
+                                    child: TextField(
+                                      decoration: InputDecoration(
+                                        hintText: "Enter your email address",
+                                        hintStyle: TextStyle(
+                                          color: Colors.black.withAlpha(80),
+                                          fontSize: 14,
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            30,
+                                          ),
+                                          borderSide: BorderSide(
+                                            color: Colors.black.withAlpha(20),
+                                          ),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                              vertical: 16,
+                                            ),
+                                      ),
                                     ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  AppButton(
+                                    text: "Book My Spot",
+                                    onPressed: () => Navigator.pop(context),
+                                    borderRadius: 30,
                                   ),
                                 ],
-                              ),
-                            ],
+                              );
+                            },
                           ),
-                          const SizedBox(height: 32),
-                          const Divider(height: 1),
                           const SizedBox(height: 20),
-                          Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.spa_outlined,
-                                  size: 16,
-                                  color: Color(0xFF8B5E3C),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  "100% Non-profit spiritual repository • Zero spam, unsubscribe anytime.",
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.black.withAlpha(100),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                     ),

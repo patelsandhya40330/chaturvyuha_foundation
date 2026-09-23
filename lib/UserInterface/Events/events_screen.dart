@@ -240,41 +240,47 @@ class _EventsScreenState extends State<EventsScreen> {
       width: double.infinity,
       color: const Color(0xFF8B5E3C),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.location_on_outlined,
-            color: Colors.white70,
-            size: 14,
-          ),
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              "Next Sanctuary Assembly: Rigveda Chanting Mahayagna commences in 12 days.",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Ensure critical notice text is always readable without overflow.
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.location_on_outlined,
+                color: Colors.white70,
+                size: 14,
               ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          if (isDesktop) ...[
-            const SizedBox(width: 24),
-            InkWell(
-              onTap: () => _showSeatBookingDialog("Rigveda Chanting Mahayagna"),
-              child: const Text(
-                "Join from anywhere online →",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 11,
-                  decoration: TextDecoration.underline,
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  "Next Sanctuary Assembly: Rigveda Chanting Mahayagna commences in 12 days.",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-          ],
-        ],
+              if (isDesktop && constraints.maxWidth > 800) ...[
+                const SizedBox(width: 24),
+                InkWell(
+                  onTap: () =>
+                      _showSeatBookingDialog("Rigveda Chanting Mahayagna"),
+                  child: const Text(
+                    "Join online →",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -621,12 +627,14 @@ class _EventsScreenState extends State<EventsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Enrolling: 12 Seats Left",
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.redAccent,
+              const Expanded(
+                child: Text(
+                  "Enrolling: 12 Seats Left",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.redAccent,
+                  ),
                 ),
               ),
               AppButton(

@@ -8,6 +8,7 @@ import '../Articles/articles_screen.dart';
 import '../BecomeMember/become_member_screen.dart';
 import '../ContactUs/contact_us_screen.dart';
 import '../Home/home_screen.dart';
+import '../Education/education_screen.dart';
 import '../dharma_sanskriti_screen/dharma_sanskriti_screen.dart';
 import '../Media/media_screen.dart';
 import '../YogaAndMeditation/yoga_meditation_screen.dart';
@@ -17,9 +18,9 @@ import '../Events/events_screen.dart';
 class _DashboardLayout {
   static const tablet = 600.0;
   static const desktop = 1100.0;
-  static const logoSize = 50.0;
+  static const logoSize = 60.0;
   static const logoAsset = 'assets/chaturvedal-logo.png';
-  static const memberIndex = 8;
+  static const memberIndex = 9;
 }
 
 class DashboardScreen extends StatefulWidget {
@@ -43,19 +44,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       HomeScreen(onTabSelected: _selectPage), // 0
       const AboutScreen(), // 1
       const YogaMeditationScreen(), // 2
-      const DharmaSanskritiScreen(), // 3
-      const EventsScreen(), // 4
-      const ArticlesScreen(), // 5
-      const MediaScreen(), // 6
-      const ContactUsScreen(), // 7
-      const BecomeMemberScreen(), // 8
+      const EducationScreen(), // 3
+      const DharmaSanskritiScreen(), // 4
+      const EventsScreen(), // 5
+      const ArticlesScreen(), // 6
+      const MediaScreen(), // 7
+      const ContactUsScreen(), // 8
+      const BecomeMemberScreen(), // 9
     ];
   }
 
   void _selectPage(int index) {
     if (!mounted) return;
     if (index < 0 || index >= _pages.length) {
-      debugPrint('Dashboard: invalid page index $index (expected 0–8).');
+      debugPrint(
+        'Dashboard: invalid page index $index (expected 0–${_pages.length - 1}).',
+      );
       return;
     }
     if (_selectedIndex != index) {
@@ -117,7 +121,7 @@ class _DashboardHeader extends StatelessWidget {
           return Material(
             color: AppColor.backgroundColor,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
               child: Row(
                 children: [
                   Expanded(child: brand),
@@ -154,7 +158,7 @@ class _DashboardHeader extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: width >= 1400 ? 60 : 24,
-              vertical: 16,
+              vertical: 24,
             ),
             child: Row(
               children: [
@@ -177,10 +181,12 @@ class _Brand extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min, // Keep brand compact to save row space.
       children: [
         const _Logo(size: _DashboardLayout.logoSize),
         const SizedBox(width: 12),
-        Expanded(
+        Flexible(
+          // Allow text to shrink/wrap instead of causing overflow.
           child: Text(
             'CHATURVEDA\nFoundations',
             overflow: TextOverflow.ellipsis,
@@ -213,7 +219,7 @@ class _Logo extends StatelessWidget {
       fit: BoxFit.contain,
       semanticLabel: 'CHATURVEDA Foundation logo',
       errorBuilder: (context, error, stackTrace) {
-        return Icon(Icons.spa, size: size, color: AppColor.primary);
+        return Image.asset(_DashboardLayout.logoAsset);
       },
     );
   }
@@ -260,7 +266,7 @@ class _ProfileAvatar extends StatelessWidget {
           backgroundColor: AppColor.surface,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 360),
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -417,17 +423,30 @@ class _ProfileAvatar extends StatelessWidget {
   }
 
   Widget _infoRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: AppColor.primary),
-        const SizedBox(width: 8),
-        Text(
-          '$label:',
-          style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const Spacer(),
-        Text(value, style: AppTextStyles.bodySmall),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: AppColor.primary),
+          const SizedBox(width: 8),
+          Text(
+            '$label:',
+            style: AppTextStyles.bodySmall.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            // Prevent long values from overflowing the row.
+            child: Text(
+              value,
+              style: AppTextStyles.bodySmall,
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -450,9 +469,9 @@ class _ProfileAvatar extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color: AppColor.primary.withAlpha(45),
-                  blurRadius: 10,
+                  blurRadius: 8,
                   spreadRadius: 1,
-                  offset: const Offset(10, 10),
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
@@ -505,7 +524,7 @@ class _DashboardDrawer extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     children: [
                       _DrawerBrand(onClose: onClose),
-                      for (var index = 0; index < 8; index++)
+                      for (var index = 0; index < 9; index++)
                         ListTile(
                           title: Text(_navigationLabel(index)),
                           selected: selectedIndex == index,
@@ -533,6 +552,7 @@ class _DashboardDrawer extends StatelessWidget {
       'Home',
       'About',
       'Yoga & Meditation',
+      'Education',
       'Dharma & Sanskriti',
       'Events',
       'Articles',
@@ -540,7 +560,9 @@ class _DashboardDrawer extends StatelessWidget {
       'Contact Us',
     ];
     final labels = AppConstants.navigationItems;
-    return index < labels.length ? labels[index] : fallback[index];
+    return index < labels.length
+        ? labels[index]
+        : (index < fallback.length ? fallback[index] : 'Unknown');
   }
 }
 

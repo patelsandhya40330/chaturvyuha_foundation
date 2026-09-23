@@ -330,57 +330,26 @@ class _MediaScreenState extends State<MediaScreen> {
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
       child: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (val) => setState(() => _searchQuery = val),
-                  decoration: InputDecoration(
-                    hintText: 'Search recitations, chants, archives...',
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: AppColor.primary,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: AppColor.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: AppColor.border),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 18,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              AppButton(
-                text: "Search",
-                onPressed: () {
-                  final q = _searchController.text.trim();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        q.isEmpty
-                            ? 'Showing all media entries'
-                            : 'Filtered archives by "$q"',
-                      ),
-                    ),
-                  );
-                },
-                isPrimary: true,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 18,
-                ),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Stack search field and button on mobile viewports.
+              if (constraints.maxWidth < 600) {
+                return Column(
+                  children: [
+                    _searchField(),
+                    const SizedBox(height: 16),
+                    SizedBox(width: double.infinity, child: _searchButton()),
+                  ],
+                );
+              }
+              return Row(
+                children: [
+                  Expanded(child: _searchField()),
+                  const SizedBox(width: 16),
+                  _searchButton(),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 32),
           SingleChildScrollView(
@@ -413,6 +382,53 @@ class _MediaScreenState extends State<MediaScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  // Consistent search field style for all screen sizes.
+  Widget _searchField() {
+    return TextField(
+      controller: _searchController,
+      onChanged: (val) => setState(() => _searchQuery = val),
+      decoration: InputDecoration(
+        hintText: 'Search recitations, chants, archives...',
+        prefixIcon: const Icon(Icons.search, color: AppColor.primary),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(color: AppColor.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(color: AppColor.border),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 18,
+        ),
+      ),
+    );
+  }
+
+  // Common search button widget.
+  Widget _searchButton() {
+    return AppButton(
+      text: "Search",
+      onPressed: () {
+        final q = _searchController.text.trim();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              q.isEmpty
+                  ? 'Showing all media entries'
+                  : 'Filtered archives by "$q"',
+            ),
+          ),
+        );
+      },
+      isPrimary: true,
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
     );
   }
 
@@ -746,81 +762,126 @@ class _MediaScreenState extends State<MediaScreen> {
                   vertical: 20,
                 ),
                 borderRadius: 20,
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColor.lightPrimary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isPlaying ? Icons.graphic_eq : Icons.headset_outlined,
-                        color: AppColor.primary,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      child: Column(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final bool isCompact = constraints.maxWidth < 500;
+
+                    if (isCompact) {
+                      // Adapt to narrow mobile screens by stacking audio controls.
+                      return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            a.title,
-                            style: AppTextStyles.title.copyWith(fontSize: 16),
+                          Row(
+                            children: [
+                              _playIcon(isPlaying),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Text(
+                                  a.title,
+                                  style: AppTextStyles.title.copyWith(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                              _playButton(isPlaying, a.title),
+                            ],
                           ),
+                          const SizedBox(height: 12),
                           Text(
                             a.description,
                             style: AppTextStyles.bodySmall,
-                            maxLines: 1,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
-                      ),
-                    ),
-                    if (isDesktop) ...[
-                      const SizedBox(width: 40),
-                      const Text(
-                        "12:45",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black38,
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        _playIcon(isPlaying),
+                        const SizedBox(width: 24),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                a.title,
+                                style: AppTextStyles.title.copyWith(
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                a.description,
+                                style: AppTextStyles.bodySmall,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                    const SizedBox(width: 20),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _currentlyPlayingAudioTitle = isPlaying
-                              ? null
-                              : a.title;
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              isPlaying
-                                  ? 'Audio paused: ${a.title}'
-                                  : 'Playing audio stream: ${a.title}',
+                        if (isDesktop) ...[
+                          const SizedBox(width: 40),
+                          const Text(
+                            "12:45",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black38,
                             ),
                           ),
-                        );
-                      },
-                      icon: Icon(
-                        isPlaying
-                            ? Icons.pause_circle_filled
-                            : Icons.play_circle_fill,
-                        color: AppColor.primary,
-                        size: 36,
-                      ),
-                    ),
-                  ],
+                        ],
+                        const SizedBox(width: 20),
+                        _playButton(isPlaying, a.title),
+                      ],
+                    );
+                  },
                 ),
               );
             }).toList(),
           ),
         ],
+      ),
+    );
+  }
+
+  // Audio leading icon.
+  Widget _playIcon(bool isPlaying) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColor.lightPrimary,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        isPlaying ? Icons.graphic_eq : Icons.headset_outlined,
+        color: AppColor.primary,
+        size: 20,
+      ),
+    );
+  }
+
+  // Audio interactive button.
+  Widget _playButton(bool isPlaying, String title) {
+    return IconButton(
+      onPressed: () {
+        setState(() {
+          _currentlyPlayingAudioTitle = isPlaying ? null : title;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isPlaying
+                  ? 'Audio paused: $title'
+                  : 'Playing audio stream: $title',
+            ),
+          ),
+        );
+      },
+      icon: Icon(
+        isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+        color: AppColor.primary,
+        size: 36,
       ),
     );
   }

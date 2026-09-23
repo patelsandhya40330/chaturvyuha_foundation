@@ -257,28 +257,6 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
           style: AppTextStyles.bodyLarge,
         ),
         const SizedBox(height: 48),
-        Row(
-          children: [
-            AppButton(
-              text: "Explore Our Vows",
-              onPressed: () => _showInfoDialog(
-                "Our Sacred Vows & Guidelines",
-                "The Sadhana Vows at Chaturveda Foundation bind every practitioner to truthfulness (Satya), non-violence (Ahiṃsā), continuous scriptural reflection (Svādhyāya), and devotion to the eternal source (Iśvarapraṇidhāna). All sessions adhere strictly to classical Patanjali and Hatha treatises without commercial dilution.",
-              ),
-              isPrimary: true,
-            ),
-            const SizedBox(width: 24),
-            TextButton.icon(
-              onPressed: _scrollToTimetable,
-              icon: const Icon(Icons.calendar_today_outlined, size: 18),
-              label: const Text("View Sadhana Schedule"),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColor.primary,
-                textStyle: AppTextStyles.button,
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
@@ -420,13 +398,18 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
                             color: AppColor.lightPrimary,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(
-                            program.type == ProgramType.yoga
-                                ? Icons.spa_outlined
-                                : Icons.psychology_outlined,
-                            color: AppColor.primary,
-                            size: 24,
-                          ),
+                          child: program.type == ProgramType.yoga
+                              ? Image.asset(
+                                  "assets/chaturvedal-logo.png",
+                                  width: 24,
+                                  height: 24,
+                                  color: AppColor.primary,
+                                )
+                              : const Icon(
+                                  Icons.psychology_outlined,
+                                  color: AppColor.primary,
+                                  size: 24,
+                                ),
                         ),
                         const SizedBox(height: 24),
                         Text(
@@ -480,15 +463,10 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Sanctuary Daily Timetable",
-                style: AppTextStyles.heading2,
-              ),
-              if (isDesktop) _buildFilters(),
-            ],
+          const Text(
+            "Sanctuary Daily Timetable",
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyles.heading2,
           ),
           if (!isDesktop) ...[const SizedBox(height: 24), _buildFilters()],
           const SizedBox(height: 48),
@@ -501,93 +479,164 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
                   vertical: 20,
                 ),
                 borderRadius: 20,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 100,
-                      child: Text(
-                        item['time'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Column(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final bool isCompact = constraints.maxWidth < 550;
+
+                    if (isCompact) {
+                      // Stack vertically on narrow cards to prevent text/button overflow.
+                      return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                item['title'],
-                                style: AppTextStyles.title.copyWith(
+                                item['time'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF1E6D9),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  item['tag'],
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColor.primary,
-                                  ),
-                                ),
-                              ),
+                              _modeBadge(item['tag']),
                             ],
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            item['title'],
+                            style: AppTextStyles.title.copyWith(fontSize: 16),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             item['location'],
                             style: AppTextStyles.bodySmall,
                           ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  item['mode'],
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColor.primary,
+                                  ),
+                                ),
+                              ),
+                              AppButton(
+                                text: "Book",
+                                onPressed: () =>
+                                    _bookSession(item['title'], item['time']),
+                                width: 90,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
-                      ),
-                    ),
-                    if (isDesktop)
-                      Expanded(
-                        child: Text(
-                          item['mode'],
-                          style: AppTextStyles.bodySmall.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColor.primary,
-                          ),
-                          textAlign: TextAlign.right,
-                        ),
-                      ),
-                    const SizedBox(width: 20),
-                    AppButton(
-                      text: "Book",
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Seat requested for "${item['title']}" at ${item['time']}. Check your Seeker Portal for pass.',
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        SizedBox(
+                          width: 80,
+                          child: Text(
+                            item['time'],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
-                            backgroundColor: AppColor.primary,
                           ),
-                        );
-                      },
-                      width: 90,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ],
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      item['title'],
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTextStyles.title.copyWith(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  _modeBadge(item['tag']),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                item['location'],
+                                style: AppTextStyles.bodySmall,
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isDesktop)
+                          Expanded(
+                            child: Text(
+                              item['mode'],
+                              style: AppTextStyles.bodySmall.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: AppColor.primary,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        const SizedBox(width: 20),
+                        AppButton(
+                          text: "Book",
+                          onPressed: () =>
+                              _bookSession(item['title'], item['time']),
+                          width: 90,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               );
             }).toList(),
           ),
         ],
+      ),
+    );
+  }
+
+  // Reusable badge for timetable tags.
+  Widget _modeBadge(String tag) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1E6D9),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        tag,
+        style: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: AppColor.primary,
+        ),
+      ),
+    );
+  }
+
+  // Reusable booking logic.
+  void _bookSession(String title, String time) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Seat requested for "$title" at $time. Check your Seeker Portal for pass.',
+        ),
+        backgroundColor: AppColor.primary,
       ),
     );
   }
@@ -792,6 +841,7 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
                           children: [
                             Text(
                               "By ${article.author}",
+                              overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.caption.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),

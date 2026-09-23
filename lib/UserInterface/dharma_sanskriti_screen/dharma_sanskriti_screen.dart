@@ -302,61 +302,26 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
           style: AppTextStyles.bodyLarge,
         ),
         const SizedBox(height: 48),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _searchController,
-                onSubmitted: (query) {
-                  if (query.trim().isNotEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Searching archives for "${query.trim()}"...',
-                        ),
-                      ),
-                    );
-                  }
-                },
-                decoration: InputDecoration(
-                  hintText:
-                      "Search Dharma topics, keywords, lineage references...",
-                  prefixIcon: const Icon(Icons.search, color: AppColor.primary),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: AppColor.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: AppColor.border),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            AppButton(
-              text: "Explore",
-              onPressed: () {
-                final query = _searchController.text.trim();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      query.isEmpty
-                          ? 'Showing all Dharma & Sanskriti topics'
-                          : 'Filtered topics by "$query"',
-                    ),
-                  ),
-                );
-              },
-              isPrimary: true,
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // Adaptive search bar layout for narrow mobile screens.
+            if (constraints.maxWidth < 600) {
+              return Column(
+                children: [
+                  _searchField(),
+                  const SizedBox(height: 16),
+                  SizedBox(width: double.infinity, child: _searchButton()),
+                ],
+              );
+            }
+            return Row(
+              children: [
+                Expanded(child: _searchField()),
+                const SizedBox(width: 16),
+                _searchButton(),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 32),
         SingleChildScrollView(
@@ -388,6 +353,60 @@ class _DharmaSanskritiScreenState extends State<DharmaSanskritiScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  // Common search field widget for responsive layout consistency.
+  Widget _searchField() {
+    return TextField(
+      controller: _searchController,
+      onSubmitted: (query) {
+        if (query.trim().isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Searching archives for "${query.trim()}"...'),
+            ),
+          );
+        }
+      },
+      decoration: InputDecoration(
+        hintText: "Search Dharma topics, keywords, lineage references...",
+        prefixIcon: const Icon(Icons.search, color: AppColor.primary),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(color: AppColor.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(color: AppColor.border),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+      ),
+    );
+  }
+
+  // Unified explore button widget for responsive switching.
+  Widget _searchButton() {
+    return AppButton(
+      text: "Explore",
+      onPressed: () {
+        final query = _searchController.text.trim();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              query.isEmpty
+                  ? 'Showing all Dharma & Sanskriti topics'
+                  : 'Filtered topics by "$query"',
+            ),
+          ),
+        );
+      },
+      isPrimary: true,
     );
   }
 

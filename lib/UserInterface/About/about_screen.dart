@@ -400,40 +400,51 @@ class _AboutScreenState extends State<AboutScreen> {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 60 : 20),
-      child: Wrap(
-        spacing: 24,
-        runSpacing: 24,
-        children: stats.map((s) {
-          double width = isDesktop
-              ? (maxWidth - 120 - 72) / 4
-              : (maxWidth - 40 - 24) / 2;
-          return AppCardContainer(
-            width: width,
-            padding: const EdgeInsets.all(24),
-            backgroundColor: const Color(0xFFF9F6F1),
-            borderRadius: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  s["label"]!,
-                  style: AppTextStyles.bulletLabel.copyWith(fontSize: 10),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final double totalWidth = constraints.maxWidth;
+          return Wrap(
+            spacing: 24,
+            runSpacing: 24,
+            children: stats.map((s) {
+              // Dynamically calculate width to prevent horizontal overflow.
+              double width;
+              if (isDesktop) {
+                width = (totalWidth - 72) / 4;
+              } else if (totalWidth > 600) {
+                width = (totalWidth - 24) / 2;
+              } else {
+                width = totalWidth;
+              }
+              return AppCardContainer(
+                width: width,
+                padding: const EdgeInsets.all(24),
+                backgroundColor: const Color(0xFFF9F6F1),
+                borderRadius: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      s["label"]!,
+                      style: AppTextStyles.bulletLabel.copyWith(fontSize: 10),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      s["value"]!,
+                      style: AppTextStyles.heading2.copyWith(
+                        color: AppColor.primary,
+                        fontSize: 32,
+                        fontFamily: 'Georgia',
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(s["desc"]!, style: AppTextStyles.bodySmall),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  s["value"]!,
-                  style: AppTextStyles.heading2.copyWith(
-                    color: AppColor.primary,
-                    fontSize: 32,
-                    fontFamily: 'Georgia',
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(s["desc"]!, style: AppTextStyles.bodySmall),
-              ],
-            ),
+              );
+            }).toList(),
           );
-        }).toList(),
+        },
       ),
     );
   }
@@ -751,32 +762,58 @@ class _AboutScreenState extends State<AboutScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 48),
-          Wrap(
-            spacing: 24,
-            runSpacing: 24,
-            children: [
-              _orgInfoCard(
-                "Cultural Integrity",
-                "Strict adherence to traditional methods of preservation and oral transmission.",
-              ),
-              _orgInfoCard(
-                "Digital Inclusivity",
-                "Ensuring global access to sacred texts for scholarly and personal growth.",
-              ),
-              _orgInfoCard(
-                "Spiritual Service",
-                "A non-profit trust dedicated to the welfare of the collective consciousness.",
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final double totalWidth = constraints.maxWidth;
+              return Wrap(
+                spacing: 24,
+                runSpacing: 24,
+                children: [
+                  _orgInfoCard(
+                    "Cultural Integrity",
+                    "Strict adherence to traditional methods of preservation and oral transmission.",
+                    totalWidth,
+                    isDesktop,
+                  ),
+                  _orgInfoCard(
+                    "Digital Inclusivity",
+                    "Ensuring global access to sacred texts for scholarly and personal growth.",
+                    totalWidth,
+                    isDesktop,
+                  ),
+                  _orgInfoCard(
+                    "Spiritual Service",
+                    "A non-profit trust dedicated to the welfare of the collective consciousness.",
+                    totalWidth,
+                    isDesktop,
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _orgInfoCard(String title, String desc) {
+  Widget _orgInfoCard(
+    String title,
+    String desc,
+    double totalWidth,
+    bool isDesktop,
+  ) {
+    // Responsive width calculation to avoid rigid pixel values.
+    double width;
+    if (isDesktop) {
+      width = (totalWidth - 48) / 3;
+    } else if (totalWidth > 700) {
+      width = (totalWidth - 24) / 2;
+    } else {
+      width = totalWidth;
+    }
+
     return AppCardContainer(
-      width: 350,
+      width: width,
       padding: const EdgeInsets.all(32),
       borderRadius: 24,
       child: Column(
@@ -883,74 +920,80 @@ class _AboutScreenState extends State<AboutScreen> {
   }
 
   Widget _buildContactForm() {
-    return Container(
-      padding: const EdgeInsets.all(40),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9F6F1),
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            TextFormField(
-              controller: _nameController,
-              keyboardType: TextInputType.name,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                hintText: "Full Name",
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(borderSide: BorderSide.none),
-              ),
-              validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Please enter your name'
-                  : null,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Adjust padding on small screens to save space.
+        double padding = constraints.maxWidth < 450 ? 20 : 40;
+        return Container(
+          padding: EdgeInsets.all(padding),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9F6F1),
+            borderRadius: BorderRadius.circular(32),
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    hintText: "Full Name",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                  ),
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Please enter your name'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    hintText: "Email Address",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                  ),
+                  validator: (value) => (value == null || !value.contains('@'))
+                      ? 'Please enter a valid email'
+                      : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _messageController,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText: "Your Message",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(borderSide: BorderSide.none),
+                  ),
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Please enter your message'
+                      : null,
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: AppButton(
+                    text: _isSubmitting ? "Sending..." : "Initiate Dialogue",
+                    onPressed: _isSubmitting ? () {} : _submitContactForm,
+                    isPrimary: true,
+                    showIcon: false,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                hintText: "Email Address",
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(borderSide: BorderSide.none),
-              ),
-              validator: (value) => (value == null || !value.contains('@'))
-                  ? 'Please enter a valid email'
-                  : null,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _messageController,
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.newline,
-              maxLines: 4,
-              decoration: const InputDecoration(
-                hintText: "Your Message",
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(borderSide: BorderSide.none),
-              ),
-              validator: (value) => (value == null || value.trim().isEmpty)
-                  ? 'Please enter your message'
-                  : null,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: AppButton(
-                text: _isSubmitting ? "Sending..." : "Initiate Dialogue",
-                onPressed: _isSubmitting ? () {} : _submitContactForm,
-                isPrimary: true,
-                showIcon: false,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

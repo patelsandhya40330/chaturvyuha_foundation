@@ -101,18 +101,21 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ],
                         ),
-                        child: Image.asset(
-                          "assets/chaturvedal-logo.png",
-                          height: 120,
-                          width: 120,
-                          fit: BoxFit.contain,
-                          color: AppColor.primary,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(
-                                Icons.spa,
-                                size: 80,
-                                color: AppColor.primary,
-                              ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: Image.asset(
+                            "assets/chaturvedal-logo.png",
+                            height: 120,
+                            width: 120,
+                            fit: BoxFit.contain,
+                            color: AppColor.primary,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.spa,
+                                  size: 80,
+                                  color: AppColor.primary,
+                                ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 32),
