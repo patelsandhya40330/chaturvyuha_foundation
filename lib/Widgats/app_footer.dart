@@ -141,24 +141,13 @@ class AppFooter extends StatelessWidget {
       children: [
         Row(
           children: [
-            Image.asset(
-              "assets/chaturvedal-logo.png",
-              color: AppColor.primary,
-              height: 48,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColor.lightPrimary,
-                  shape: BoxShape.circle,
-                ),
-                child: Image.asset(
-                  "assets/chaturvedal-logo.png",
-                  height: 28,
-                  width: 28,
-                  fit: BoxFit.contain,
-                ),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: AppColor.lightPrimary,
+                shape: BoxShape.circle,
               ),
+              child: const Icon(Icons.spa, color: AppColor.primary, size: 28),
             ),
             const SizedBox(width: 12),
             Expanded(

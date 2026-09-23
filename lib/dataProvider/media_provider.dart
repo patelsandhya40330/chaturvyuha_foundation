@@ -69,14 +69,14 @@ class MediaProvider extends ChangeNotifier {
           "Authentic Vedic chanting recorded with high fidelity resonance.",
       category: "Canonical Chanting",
       type: MediaType.audio,
-      assetPath: "assets/chaturvedal-logo.png",
+      assetPath: "assets/image_1.png",
     ),
     MediaItem(
       title: "Mantra Sadhana for Deep Meditative Focus",
       description: "A series of seed mantras guided by Acharya Shridhar.",
       category: "Canonical Chanting",
       type: MediaType.audio,
-      assetPath: "assets/chaturvedal-logo.png",
+      assetPath: "assets/image_2.png",
     ),
 
     // Documents - Treatises
@@ -86,7 +86,7 @@ class MediaProvider extends ChangeNotifier {
           "A comprehensive guide to the text with phonetic transliterations.",
       category: "Canonical Treatises",
       type: MediaType.document,
-      assetPath: "assets/chaturvedal-logo.png",
+      assetPath: "assets/image_3.png",
     ),
     MediaItem(
       title: "Vedic Panchanga Alignment for 2024",
@@ -94,7 +94,7 @@ class MediaProvider extends ChangeNotifier {
           "A scholarly calendar tracking auspicious astronomical transits.",
       category: "Canonical Treatises",
       type: MediaType.document,
-      assetPath: "assets/chaturvedal-logo.png",
+      assetPath: "assets/image_1.png",
     ),
   ];
 

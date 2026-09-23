@@ -7,6 +7,7 @@ import 'dataProvider/article_provider.dart';
 import 'dataProvider/event_provider.dart';
 import 'dataProvider/media_provider.dart';
 import 'dataProvider/membership_provider.dart';
+import 'dataProvider/booking_provider.dart';
 
 void main() {
   // Ensure Flutter engine bindings are initialized before running runApp
@@ -21,6 +22,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => EventProvider()),
         ChangeNotifierProvider(create: (context) => MediaProvider()),
         ChangeNotifierProvider(create: (context) => MembershipProvider()),
+        ChangeNotifierProvider(create: (context) => BookingProvider()),
       ],
       child: const MyApp(),
     ),

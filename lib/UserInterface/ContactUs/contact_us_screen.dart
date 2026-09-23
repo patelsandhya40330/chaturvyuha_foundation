@@ -183,14 +183,6 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         children: [
           _buildBreadcrumbs(),
           const SizedBox(height: 32),
-          Image.asset(
-            "assets/chaturvedal-logo.png",
-            height: 50,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) =>
-                const SizedBox.shrink(),
-          ),
-          const SizedBox(height: 16),
           const SectionLabel(text: "GLOBAL REACH & SUPPORT"),
           const SizedBox(height: 24),
           RichText(

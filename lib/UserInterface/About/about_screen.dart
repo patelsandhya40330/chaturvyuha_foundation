@@ -705,10 +705,10 @@ class _AboutScreenState extends State<AboutScreen> {
                   color: Color(0xFFFDFBF7),
                   shape: BoxShape.circle,
                 ),
-                child: Image.asset(
-                  "assets/chaturvedal-logo.png",
+                child: const Icon(
+                  Icons.spa,
                   color: AppColor.primary,
-                  height: 200,
+                  size: 140,
                 ),
               ),
             ),

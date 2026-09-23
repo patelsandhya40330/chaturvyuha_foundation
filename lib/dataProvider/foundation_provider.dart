@@ -249,10 +249,7 @@ class FoundationProvider extends ChangeNotifier {
       time: "5:30 PM",
       location: "North Courtyard",
       status: EventStatus.completed,
-      galleryImages: [
-        "assets/chaturvedal-logo.png",
-        "assets/chaturvedal-logo.png",
-      ],
+      galleryImages: ["assets/image_1.png", "assets/image_2.png"],
     ),
     EventItem(
       title: "Sanskrit Youth Forum 2024",
@@ -273,7 +270,7 @@ class FoundationProvider extends ChangeNotifier {
       description: "High-resolution portrait of a evening prayer invocation.",
       category: "Festivals",
       type: MediaType.photo,
-      assetPath: "assets/chaturvedal-logo.png",
+      assetPath: "assets/image_1.png",
     ),
     MediaItem(
       title: "Inaugural Speech 2023",
@@ -281,14 +278,14 @@ class FoundationProvider extends ChangeNotifier {
           "Video record of the initial foundational introduction address.",
       category: "Discourses",
       type: MediaType.video,
-      assetPath: "assets/chaturvedal-logo.png",
+      assetPath: "assets/image_2.png",
     ),
     MediaItem(
       title: "Guided Breath Meditation Audio Track",
       description: "A calming 15-minute voice guide for daily practice.",
       category: "Practice",
       type: MediaType.audio,
-      assetPath: "assets/chaturvedal-logo.png",
+      assetPath: "assets/image_3.png",
     ),
     MediaItem(
       title: "Vedic Philosophy Study Guide",
@@ -296,7 +293,7 @@ class FoundationProvider extends ChangeNotifier {
           "Comprehensive outline of key text definitions and reading assignments.",
       category: "Education",
       type: MediaType.document,
-      assetPath: "assets/chaturvedal-logo.png",
+      assetPath: "assets/image_1.png",
     ),
   ];
 }

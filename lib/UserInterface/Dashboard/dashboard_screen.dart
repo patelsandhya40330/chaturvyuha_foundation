@@ -6,20 +6,18 @@ import 'package:chaturvyuha_foundation/utils/app_constants.dart';
 import '../About/about_screen.dart';
 import '../Articles/articles_screen.dart';
 import '../BecomeMember/become_member_screen.dart';
+import '../Booking/booking_screen.dart';
 import '../ContactUs/contact_us_screen.dart';
 import '../Home/home_screen.dart';
-import '../Education/education_screen.dart';
 import '../dharma_sanskriti_screen/dharma_sanskriti_screen.dart';
 import '../Media/media_screen.dart';
 import '../YogaAndMeditation/yoga_meditation_screen.dart';
 import '../Events/events_screen.dart';
 
-// Edit shared dashboard dimensions and breakpoints here.
+// Shared dashboard layout configuration
 class _DashboardLayout {
   static const tablet = 600.0;
   static const desktop = 1100.0;
-  static const logoSize = 38.0;
-  static const logoAsset = 'assets/chaturvedal-logo.png';
   static const memberIndex = 9;
 }
 
@@ -31,7 +29,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  // A key accesses this Scaffold safely from callbacks above its context.
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
   late final List<Widget> _pages;
@@ -39,16 +36,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    // Keep these indices aligned with AppConstants.navigationItems.
     _pages = [
       HomeScreen(onTabSelected: _selectPage), // 0
       const AboutScreen(), // 1
       const YogaMeditationScreen(), // 2
-      const EducationScreen(), // 3
-      const DharmaSanskritiScreen(), // 4
-      const EventsScreen(), // 5
-      const ArticlesScreen(), // 6
-      const MediaScreen(), // 7
+      const DharmaSanskritiScreen(), // 3
+      const EventsScreen(), // 4
+      const ArticlesScreen(), // 5
+      const MediaScreen(), // 6
+      BookingScreen(onTabSelected: _selectPage), // 7
       const ContactUsScreen(), // 8
       const BecomeMemberScreen(), // 9
     ];
@@ -116,7 +112,6 @@ class _DashboardHeader extends StatelessWidget {
         final mobile = width < _DashboardLayout.tablet;
         final brand = _Brand(desktop: desktop);
 
-        // On mobile screens, present a clean single row: Brand on left, Menu icon on right.
         if (mobile) {
           return Material(
             color: AppColor.backgroundColor,
@@ -136,7 +131,6 @@ class _DashboardHeader extends StatelessWidget {
           );
         }
 
-        // On desktop/tablet, display brand on left and action controls on right.
         final controls = Wrap(
           spacing: 12,
           runSpacing: 8,
@@ -181,12 +175,18 @@ class _Brand extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisSize: MainAxisSize.min, // Keep brand compact to save row space.
+      mainAxisSize: MainAxisSize.min,
       children: [
-        const _Logo(size: _DashboardLayout.logoSize),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColor.primary.withAlpha(20),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.spa, color: AppColor.primary, size: 24),
+        ),
         const SizedBox(width: 12),
         Flexible(
-          // Allow text to shrink/wrap instead of causing overflow.
           child: Text(
             'CHATURVEDA\nFoundations',
             overflow: TextOverflow.ellipsis,
@@ -200,27 +200,6 @@ class _Brand extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _Logo extends StatelessWidget {
-  const _Logo({required this.size, this.color = AppColor.primary});
-  final double size;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Image.asset(
-      _DashboardLayout.logoAsset,
-      color: color,
-      width: size,
-      height: size,
-      fit: BoxFit.contain,
-      semanticLabel: 'CHATURVEDA Foundation logo',
-      errorBuilder: (context, error, stackTrace) {
-        return Image.asset(_DashboardLayout.logoAsset);
-      },
     );
   }
 }
@@ -271,7 +250,6 @@ class _ProfileAvatar extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Top Row with Close Button
                   Align(
                     alignment: Alignment.centerRight,
                     child: IconButton(
@@ -280,8 +258,6 @@ class _ProfileAvatar extends StatelessWidget {
                       tooltip: 'Close Profile',
                     ),
                   ),
-
-                  // Avatar
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
@@ -295,8 +271,6 @@ class _ProfileAvatar extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // User Name
                   const Text(
                     'Acharya Seeker',
                     textAlign: TextAlign.center,
@@ -310,8 +284,6 @@ class _ProfileAvatar extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-
-                  // Email
                   Text(
                     'seeker@chaturvyuha.org',
                     textAlign: TextAlign.center,
@@ -322,8 +294,6 @@ class _ProfileAvatar extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Membership Tag Badge
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -353,18 +323,12 @@ class _ProfileAvatar extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-
                   const Divider(),
                   const SizedBox(height: 12),
-
-                  // Quick Info Rows
                   _infoRow(Icons.card_membership, 'Member ID', 'CF-2024-8809'),
                   const SizedBox(height: 8),
                   _infoRow(Icons.calendar_today, 'Joined', 'January 15, 2024'),
-
                   const SizedBox(height: 24),
-
-                  // Action Buttons
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -438,7 +402,6 @@ class _ProfileAvatar extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Expanded(
-            // Prevent long values from overflowing the row.
             child: Text(
               value,
               style: AppTextStyles.bodySmall,
@@ -524,13 +487,69 @@ class _DashboardDrawer extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     children: [
                       _DrawerBrand(onClose: onClose),
-                      for (var index = 0; index < 9; index++)
+                      const SizedBox(height: 12),
+                      for (var index = 0; index < 10; index++)
                         ListTile(
+                          leading: Icon(
+                            _navigationIcon(index),
+                            color: selectedIndex == index
+                                ? AppColor.primary
+                                : Colors.black54,
+                            size: 20,
+                          ),
                           title: Text(_navigationLabel(index)),
                           selected: selectedIndex == index,
                           selectedColor: AppColor.primary,
                           onTap: () => onSelected(index),
                         ),
+                      const Divider(height: 24),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          "CONNECT WITH US",
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                            color: Colors.black45,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _drawerSocialIcon(
+                              context,
+                              Icons.facebook,
+                              "Facebook",
+                            ),
+                            _drawerSocialIcon(
+                              context,
+                              Icons.camera_alt_outlined,
+                              "Instagram",
+                            ),
+                            _drawerSocialIcon(
+                              context,
+                              Icons.smart_display_outlined,
+                              "YouTube",
+                            ),
+                            _drawerSocialIcon(
+                              context,
+                              Icons.chat_bubble_outline,
+                              "WhatsApp",
+                            ),
+                            _drawerSocialIcon(
+                              context,
+                              Icons.email_outlined,
+                              "Email",
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       if (!stickyMembership) ...[
                         const Divider(height: 1),
                         membership,
@@ -547,17 +566,57 @@ class _DashboardDrawer extends StatelessWidget {
     );
   }
 
+  Widget _drawerSocialIcon(BuildContext context, IconData icon, String label) {
+    return Tooltip(
+      message: 'Follow us on $label',
+      child: InkWell(
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Opening $label official channel...')),
+          );
+        },
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: AppColor.primary.withAlpha(20),
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColor.primary.withAlpha(50)),
+          ),
+          child: Icon(icon, size: 18, color: AppColor.primary),
+        ),
+      ),
+    );
+  }
+
+  IconData _navigationIcon(int index) {
+    const icons = [
+      Icons.home_outlined,
+      Icons.info_outline,
+      Icons.self_improvement,
+      Icons.auto_stories_outlined,
+      Icons.event_outlined,
+      Icons.article_outlined,
+      Icons.play_circle_outline,
+      Icons.bookmark_added_outlined,
+      Icons.mail_outline,
+      Icons.card_membership_outlined,
+    ];
+    return index < icons.length ? icons[index] : Icons.circle_outlined;
+  }
+
   String _navigationLabel(int index) {
     const fallback = [
       'Home',
       'About',
       'Yoga & Meditation',
-      'Education',
       'Dharma & Sanskriti',
       'Events',
       'Articles',
       'Media',
+      'My Bookings',
       'Contact Us',
+      'Become a Member',
     ];
     final labels = AppConstants.navigationItems;
     return index < labels.length
@@ -587,9 +646,8 @@ class _DrawerBrand extends StatelessWidget {
                 icon: const Icon(Icons.close, color: Colors.white),
               ),
             ),
-            const Center(child: _Logo(size: 60, color: Colors.white)),
+            const Center(child: Icon(Icons.spa, color: Colors.white, size: 40)),
             const SizedBox(height: 12),
-
             const Text(
               'CHATURVEDA',
               textAlign: TextAlign.center,

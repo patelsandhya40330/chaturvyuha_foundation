@@ -7,6 +7,7 @@ class AppConstants {
     "Events & Programs",
     "Articles",
     "Media",
+    "My Bookings",
     "Contact",
     "Become a Member",
   ];

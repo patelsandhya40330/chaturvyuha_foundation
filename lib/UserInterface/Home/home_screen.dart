@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionLabelWithDot("WISDOM • WELLNESS • COMMUNITY"),
+        _buildSectionLabelWithDot(" WISDOM • WELLNESS • COMMUNITY"),
         const SizedBox(height: 24),
         const Text("Ancient Wisdom.", style: AppTextStyles.heroHeading),
         const Text("A Meaningful Life.", style: AppTextStyles.heroSubheading),

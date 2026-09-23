@@ -392,11 +392,10 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: program.type == ProgramType.yoga
-                              ? Image.asset(
-                                  "assets/chaturvedal-logo.png",
-                                  width: 24,
-                                  height: 24,
+                              ? const Icon(
+                                  Icons.self_improvement,
                                   color: AppColor.primary,
+                                  size: 24,
                                 )
                               : const Icon(
                                   Icons.psychology_outlined,

@@ -226,14 +226,6 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(
-            "assets/chaturvedal-logo.png",
-            height: 50,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) =>
-                const SizedBox.shrink(),
-          ),
-          const SizedBox(height: 16),
           const SectionLabel(text: "INITIATION & SANGHA PORTAL"),
           const SizedBox(height: 24),
           Text(
