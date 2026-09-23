@@ -24,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Ensure Flutter engine binding is active before starting animation & timer
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _startSplashSequence();
     });
 
@@ -91,7 +92,6 @@ class _SplashScreenState extends State<SplashScreen>
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
                           color: AppColor.lightPrimary.withAlpha(120),
                           boxShadow: [
                             BoxShadow(
@@ -105,16 +105,16 @@ class _SplashScreenState extends State<SplashScreen>
                           borderRadius: BorderRadius.circular(100),
                           child: Image.asset(
                             "assets/chaturvedal-logo.png",
-                            height: 120,
-                            width: 120,
+                            scale: 15,
                             fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Image.asset(
-                                  "assets/chaturvedal-logo.png",
-                                  height: 120,
-                                  width: 120,
-                                  fit: BoxFit.contain,
-                                ),
+                            errorBuilder: (context, error, stackTrace) {
+                              debugPrint('Splash logo failed: $error');
+                              return Image.asset(
+                                "assets/chaturvedal-logo.png",
+                                scale: 15,
+                                fit: BoxFit.cover,
+                              );
+                            },
                           ),
                         ),
                       ),
