@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:chaturvyuha_foundation/utils/app_colors.dart';
 import 'package:chaturvyuha_foundation/utils/app_text_styles.dart';
 import '../Dashboard/dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final Widget? nextScreen;
+  const SplashScreen({super.key, this.nextScreen});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -13,9 +13,10 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _animationController;
+  late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
   late final Animation<double> _scaleAnimation;
+  late final Animation<double> _pulseAnimation;
 
   Timer? _navigationTimer;
 
@@ -23,20 +24,24 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(
+    _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1400),
     );
 
-    _fadeAnimation = _animationController.drive(
-      CurveTween(curve: Curves.easeIn),
-    );
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    _scaleAnimation = _animationController
-        .drive(CurveTween(curve: Curves.easeOutBack))
-        .drive(Tween<double>(begin: 0.85, end: 1.0));
+    _scaleAnimation = Tween<double>(
+      begin: 0.82,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
-    _animationController.forward();
+    _pulseAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.08,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _controller.forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -45,17 +50,18 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void _startSplashSequence() {
-    _navigationTimer = Timer(const Duration(milliseconds: 2500), () {
+    _navigationTimer = Timer(const Duration(milliseconds: 2800), () {
       if (!mounted) return;
+
+      final target = widget.nextScreen ?? const DashboardScreen();
 
       Navigator.of(context).pushReplacement(
         PageRouteBuilder<void>(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const DashboardScreen(),
+          pageBuilder: (context, animation, secondaryAnimation) => target,
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
-          transitionDuration: const Duration(milliseconds: 600),
+          transitionDuration: const Duration(milliseconds: 700),
         ),
       );
     });
@@ -64,124 +70,218 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void dispose() {
     _navigationTimer?.cancel();
-    _animationController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.backgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(50),
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Spacer(),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF824F1A), // Brand primary warm brown
+              Color(0xFF4A2B0E), // Deep sanctuary dark bronze
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 28),
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const SizedBox(height: 20),
 
-                  // White circle with the logo tinted in the primary color.
-                  Container(
-                    height: 120,
-                    width: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColor.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColor.primary.withAlpha(25),
-                          blurRadius: 30,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Image.asset(
-                          'assets/chaturvedal-logo.png',
-                          fit: BoxFit.contain,
-                          color: AppColor.primary,
-                          errorBuilder: (context, error, stackTrace) {
-                            debugPrint('Splash logo failed: $error');
+                            // Main Central Emblem & Brand Name Section
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(height: 40),
 
-                            return const Icon(
-                              Icons.broken_image_outlined,
-                              size: 48,
-                              color: AppColor.primary,
-                            );
-                          },
+                                // Animated Concentric Sacred Lotus Badge
+                                AnimatedBuilder(
+                                  animation: _pulseAnimation,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      scale: _pulseAnimation.value,
+                                      child: Container(
+                                        width: 140,
+                                        height: 140,
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: const Color(
+                                              0xFFE5C185,
+                                            ).withAlpha(100),
+                                            width: 2,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withAlpha(60),
+                                              blurRadius: 30,
+                                              offset: const Offset(0, 10),
+                                            ),
+                                            BoxShadow(
+                                              color: const Color(
+                                                0xFFE5C185,
+                                              ).withAlpha(30),
+                                              blurRadius: 40,
+                                              spreadRadius: 5,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.white.withAlpha(20),
+                                            border: Border.all(
+                                              color: Colors.white.withAlpha(40),
+                                            ),
+                                          ),
+                                          child: const Center(
+                                            child: Icon(
+                                              Icons.spa,
+                                              size: 68,
+                                              color: Color(0xFFFDFBF7),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 36),
+
+                                // Foundation Title
+                                const FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'CHATURVEDA',
+                                    style: TextStyle(
+                                      fontFamily: 'Georgia',
+                                      fontSize: 34,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 4,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black26,
+                                          blurRadius: 10,
+                                          offset: Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                // Gold Sub-Label
+                                const Text(
+                                  'FOUNDATIONS',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 6,
+                                    color: Color(0xFFE5C185),
+                                  ),
+                                ),
+                                const SizedBox(height: 28),
+
+                                // Decorative Gold Divider
+                                Container(
+                                  width: 44,
+                                  height: 2,
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFFE5C185,
+                                    ).withAlpha(180),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                const SizedBox(height: 28),
+
+                                // Poetic Tagline
+                                const Text(
+                                  'Ancient Wisdom.\nA Meaningful Life.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontFamily: 'Georgia',
+                                    fontSize: 22,
+                                    height: 1.5,
+                                    fontStyle: FontStyle.italic,
+                                    color: Color(0xFFFDFBF7),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            // Bottom Indicator & Tagline
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 40,
+                                bottom: 28,
+                              ),
+                              child: Column(
+                                children: [
+                                  // Subtle Circular / Linear Loading Bar
+                                  SizedBox(
+                                    width: 140,
+                                    child: LinearProgressIndicator(
+                                      minHeight: 3,
+                                      backgroundColor: Colors.white24,
+                                      color: const Color(0xFFE5C185),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  const Text(
+                                    'WISDOM • WELLNESS • COMMUNITY',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 2.0,
+                                      color: Color(0xFFE5C185),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+
+                                  Text(
+                                    'Guarding Eternal Wisdom in a Rapidly Moving Age',
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.caption.copyWith(
+                                      fontSize: 11,
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
-
-                  const Text(
-                    'CHATURVEDA',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2.5,
-                      color: AppColor.heading,
-                      fontFamily: 'Georgia',
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-
-                  Text(
-                    'FOUNDATIONS',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.sectionLabel.copyWith(
-                      fontSize: 12,
-                      letterSpacing: 3,
-                      color: AppColor.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  Text(
-                    'WISDOM • WELLNESS • COMMUNITY',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bulletLabel.copyWith(
-                      fontSize: 10,
-                      letterSpacing: 2,
-                      color: AppColor.bodyText.withAlpha(180),
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  SizedBox(
-                    width: 120,
-                    child: LinearProgressIndicator(
-                      backgroundColor: AppColor.primary.withAlpha(30),
-                      color: AppColor.primary,
-                      borderRadius: BorderRadius.circular(4),
-                      minHeight: 3,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  Text(
-                    'Guarding Eternal Wisdom in a Rapidly Moving Age',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.caption.copyWith(
-                      fontSize: 11,
-                      fontStyle: FontStyle.italic,
-                      color: AppColor.bodyText.withAlpha(150),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

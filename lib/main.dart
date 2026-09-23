@@ -1,3 +1,4 @@
+import 'package:chaturvyuha_foundation/UserInterface/Dashboard/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'UserInterface/Splash/splash_screen.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Chaturveda Foundation',
       theme: ThemeData(fontFamily: 'Georgia', useMaterial3: true),
-      home: const SplashScreen(),
+      home: const SplashScreen(nextScreen: DashboardScreen()),
     );
   }
 }
