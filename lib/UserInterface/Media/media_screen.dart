@@ -26,11 +26,10 @@ class _MediaScreenState extends State<MediaScreen> {
 
   final List<String> _filters = [
     'All Media',
-    'Master Recitations',
-    'Sacred Moments',
-    'Cinematic Chronicles',
-    'Canonical Chanting',
-    'Canonical Treatises',
+    'Photos',
+    'Videos',
+    'Bhajans & Chants',
+    'Treatises & PDFs',
   ];
 
   @override
@@ -173,6 +172,12 @@ class _MediaScreenState extends State<MediaScreen> {
   Widget build(BuildContext context) {
     final mediaProvider = context.watch<MediaProvider>();
 
+    final bool showAll = _activeFilter == 'All Media';
+    final bool showPhotos = showAll || _activeFilter == 'Photos';
+    final bool showVideos = showAll || _activeFilter == 'Videos';
+    final bool showAudio = showAll || _activeFilter == 'Bhajans & Chants';
+    final bool showDocs = showAll || _activeFilter == 'Treatises & PDFs';
+
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
       body: LayoutBuilder(
@@ -191,32 +196,35 @@ class _MediaScreenState extends State<MediaScreen> {
                 // 2. SEARCH & FILTERS
                 _buildSearchSection(isDesktop),
 
-                const SizedBox(height: 80),
+                const SizedBox(height: 60),
 
-                // 3. FEATURED VIDEO (Master Recitations)
-                _buildFeaturedVideo(isDesktop, mediaProvider),
+                // 3. FEATURED VIDEO & VIDEOS
+                if (showVideos) ...[
+                  _buildFeaturedVideo(isDesktop, mediaProvider),
+                  const SizedBox(height: 80),
+                  _buildVideoSlider(isDesktop, mediaProvider),
+                  const SizedBox(height: 80),
+                ],
 
-                const SizedBox(height: 120),
+                // 4. PHOTO GRID
+                if (showPhotos) ...[
+                  _buildPhotoGrid(isDesktop, mediaProvider),
+                  const SizedBox(height: 80),
+                ],
 
-                // 4. PHOTO GRID (Sacred Moments)
-                _buildPhotoGrid(isDesktop, mediaProvider),
+                // 5. AUDIO LIST
+                if (showAudio) ...[
+                  _buildAudioList(isDesktop, mediaProvider),
+                  const SizedBox(height: 80),
+                ],
 
-                const SizedBox(height: 120),
+                // 6. DOCUMENT GRID
+                if (showDocs) ...[
+                  _buildDocumentGrid(isDesktop, mediaProvider),
+                  const SizedBox(height: 80),
+                ],
 
-                // 5. VIDEO SLIDER (Cinematic Chronicles)
-                _buildVideoSlider(isDesktop, mediaProvider),
-
-                const SizedBox(height: 120),
-
-                // 6. AUDIO LIST (Canonical Chanting)
-                _buildAudioList(isDesktop, mediaProvider),
-
-                const SizedBox(height: 120),
-
-                // 7. DOCUMENT GRID (Canonical Treatises)
-                _buildDocumentGrid(isDesktop, mediaProvider),
-
-                const SizedBox(height: 100),
+                const SizedBox(height: 40),
 
                 // FOOTER
                 AppFooter(isDesktop: isDesktop),
@@ -332,7 +340,6 @@ class _MediaScreenState extends State<MediaScreen> {
         children: [
           LayoutBuilder(
             builder: (context, constraints) {
-              // Stack search field and button on mobile viewports.
               if (constraints.maxWidth < 600) {
                 return Column(
                   children: [
@@ -351,41 +358,38 @@ class _MediaScreenState extends State<MediaScreen> {
               );
             },
           ),
-          const SizedBox(height: 32),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _filters.map((filter) {
-                final bool isActive = _activeFilter == filter;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: ChoiceChip(
-                    label: Text(filter),
-                    selected: isActive,
-                    onSelected: (val) {
-                      if (val) setState(() => _activeFilter = filter);
-                    },
-                    selectedColor: AppColor.primary,
-                    backgroundColor: Colors.white,
-                    labelStyle: TextStyle(
-                      color: isActive ? Colors.white : Colors.black,
-                      fontSize: 13,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      side: const BorderSide(color: AppColor.border),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
+          const SizedBox(height: 24),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: _filters.map((filter) {
+              final bool isActive = _activeFilter == filter;
+              return ChoiceChip(
+                label: Text(filter),
+                selected: isActive,
+                onSelected: (val) {
+                  if (val) setState(() => _activeFilter = filter);
+                },
+                selectedColor: AppColor.primary,
+                backgroundColor: Colors.white,
+                labelStyle: TextStyle(
+                  color: isActive ? Colors.white : Colors.black87,
+                  fontSize: 13,
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  side: const BorderSide(color: AppColor.border),
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),
     );
   }
 
-  // Consistent search field style for all screen sizes.
   Widget _searchField() {
     return TextField(
       controller: _searchController,
@@ -411,7 +415,6 @@ class _MediaScreenState extends State<MediaScreen> {
     );
   }
 
-  // Common search button widget.
   Widget _searchButton() {
     return AppButton(
       text: "Search",
@@ -435,7 +438,8 @@ class _MediaScreenState extends State<MediaScreen> {
   // --- 3. FEATURED VIDEO ---
   Widget _buildFeaturedVideo(bool isDesktop, MediaProvider provider) {
     final featured = provider.allMedia.firstWhere(
-      (m) => m.category == "Master Recitations",
+      (m) => m.type == MediaType.video || m.category == "Master Recitations",
+      orElse: () => provider.allMedia.first,
     );
 
     return Padding(
@@ -548,7 +552,7 @@ class _MediaScreenState extends State<MediaScreen> {
     final photos = provider.allMedia
         .where(
           (m) =>
-              m.category == "Sacred Moments" &&
+              (m.type == MediaType.photo || m.category == "Sacred Moments") &&
               (_searchQuery.isEmpty ||
                   m.title.toLowerCase().contains(_searchQuery.toLowerCase())),
         )
@@ -642,7 +646,10 @@ class _MediaScreenState extends State<MediaScreen> {
   // --- 5. VIDEO SLIDER ---
   Widget _buildVideoSlider(bool isDesktop, MediaProvider provider) {
     final videos = provider.allMedia
-        .where((m) => m.category == "Cinematic Chronicles")
+        .where(
+          (m) =>
+              m.type == MediaType.video || m.category == "Cinematic Chronicles",
+        )
         .toList();
 
     return Container(
@@ -737,7 +744,10 @@ class _MediaScreenState extends State<MediaScreen> {
   // --- 6. AUDIO LIST ---
   Widget _buildAudioList(bool isDesktop, MediaProvider provider) {
     final audio = provider.allMedia
-        .where((m) => m.category == "Canonical Chanting")
+        .where(
+          (m) =>
+              m.type == MediaType.audio || m.category == "Canonical Chanting",
+        )
         .toList();
 
     return Padding(
@@ -748,7 +758,7 @@ class _MediaScreenState extends State<MediaScreen> {
           const SectionLabel(text: "SHRAVANA VIDYĀ"),
           const SizedBox(height: 24),
           const Text(
-            "Canonical Chanting & Lineage Discourses",
+            "Canonical Chanting, Bhajans & Lineage Discourses",
             style: AppTextStyles.heading2,
           ),
           const SizedBox(height: 48),
@@ -767,7 +777,6 @@ class _MediaScreenState extends State<MediaScreen> {
                     final bool isCompact = constraints.maxWidth < 500;
 
                     if (isCompact) {
-                      // Adapt to narrow mobile screens by stacking audio controls.
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -845,11 +854,10 @@ class _MediaScreenState extends State<MediaScreen> {
     );
   }
 
-  // Audio leading icon.
   Widget _playIcon(bool isPlaying) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColor.lightPrimary,
         shape: BoxShape.circle,
       ),
@@ -861,7 +869,6 @@ class _MediaScreenState extends State<MediaScreen> {
     );
   }
 
-  // Audio interactive button.
   Widget _playButton(bool isPlaying, String title) {
     return IconButton(
       onPressed: () {
@@ -889,7 +896,11 @@ class _MediaScreenState extends State<MediaScreen> {
   // --- 7. DOCUMENT GRID ---
   Widget _buildDocumentGrid(bool isDesktop, MediaProvider provider) {
     final docs = provider.allMedia
-        .where((m) => m.category == "Canonical Treatises")
+        .where(
+          (m) =>
+              m.type == MediaType.document ||
+              m.category == "Canonical Treatises",
+        )
         .toList();
 
     return Padding(
