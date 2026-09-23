@@ -224,6 +224,25 @@ class _AboutScreenState extends State<AboutScreen> {
   }
 
   // --- 1. HERO SECTION ---
+  Widget _buildBreadcrumbs() {
+    return Row(
+      children: [
+        Text(
+          "Home",
+          style: AppTextStyles.bodySmall.copyWith(color: AppColor.grey),
+        ),
+        const Icon(Icons.chevron_right, size: 14, color: AppColor.grey),
+        Text(
+          "About Us",
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColor.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildHeroSection(bool isDesktop) {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -236,13 +255,7 @@ class _AboutScreenState extends State<AboutScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "About Us",
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColor.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              _buildBreadcrumbs(),
               if (isDesktop)
                 Container(
                   padding: const EdgeInsets.symmetric(

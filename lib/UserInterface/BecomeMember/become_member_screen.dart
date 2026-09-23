@@ -216,6 +216,25 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
     );
   }
 
+  Widget _buildBreadcrumbs() {
+    return Row(
+      children: [
+        Text(
+          "Home",
+          style: AppTextStyles.bodySmall.copyWith(color: AppColor.grey),
+        ),
+        const Icon(Icons.chevron_right, size: 14, color: AppColor.grey),
+        Text(
+          "Become a Member",
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColor.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   // --- 1. HERO SECTION ---
   Widget _buildHeroSection(bool isDesktop) {
     return Padding(
@@ -226,6 +245,8 @@ class _BecomeMemberScreenState extends State<BecomeMemberScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildBreadcrumbs(),
+          const SizedBox(height: 24),
           const SectionLabel(text: "INITIATION & SANGHA PORTAL"),
           const SizedBox(height: 24),
           Text(

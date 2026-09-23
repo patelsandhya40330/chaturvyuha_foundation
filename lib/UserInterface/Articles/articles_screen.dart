@@ -236,7 +236,7 @@ class _ArticlesScreenState extends State<ArticlesScreen> {
         ),
         const Icon(Icons.chevron_right, size: 14, color: AppColor.grey),
         Text(
-          "Knowledge & Articles",
+          "Articles",
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColor.primary,
             fontWeight: FontWeight.bold,

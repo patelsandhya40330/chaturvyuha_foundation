@@ -228,10 +228,31 @@ class _YogaMeditationScreenState extends State<YogaMeditationScreen> {
     );
   }
 
+  Widget _buildBreadcrumbs() {
+    return Row(
+      children: [
+        Text(
+          "Home",
+          style: AppTextStyles.bodySmall.copyWith(color: AppColor.grey),
+        ),
+        const Icon(Icons.chevron_right, size: 14, color: AppColor.grey),
+        Text(
+          "Yoga & Meditation",
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColor.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildHeroLeft() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildBreadcrumbs(),
+        const SizedBox(height: 24),
         RichText(
           text: const TextSpan(
             style: AppTextStyles.heroHeading,

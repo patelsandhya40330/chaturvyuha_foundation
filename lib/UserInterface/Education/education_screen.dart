@@ -84,6 +84,25 @@ class _EducationScreenState extends State<EducationScreen> {
     );
   }
 
+  Widget _buildBreadcrumbs() {
+    return Row(
+      children: [
+        Text(
+          "Home",
+          style: AppTextStyles.bodySmall.copyWith(color: AppColor.grey),
+        ),
+        const Icon(Icons.chevron_right, size: 14, color: AppColor.grey),
+        Text(
+          "Vedic Education",
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColor.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   // --- 1. HERO SECTION ---
   Widget _buildHeroSection(bool isDesktop) {
     return Padding(
@@ -94,6 +113,8 @@ class _EducationScreenState extends State<EducationScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildBreadcrumbs(),
+          const SizedBox(height: 24),
           const SectionLabel(text: "AUTHENTIC VEDIC EPISTEMOLOGY"),
           const SizedBox(height: 24),
           if (isDesktop)

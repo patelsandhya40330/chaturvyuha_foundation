@@ -285,6 +285,25 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
+  Widget _buildBreadcrumbs() {
+    return Row(
+      children: [
+        Text(
+          "Home",
+          style: AppTextStyles.bodySmall.copyWith(color: AppColor.grey),
+        ),
+        const Icon(Icons.chevron_right, size: 14, color: AppColor.grey),
+        Text(
+          "Events & Programs",
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColor.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   // --- 2. HERO FEATURED EVENT ---
   Widget _buildHeroEvent(bool isDesktop) {
     return Padding(
@@ -292,26 +311,36 @@ class _EventsScreenState extends State<EventsScreen> {
         horizontal: isDesktop ? 60 : 20,
         vertical: 40,
       ),
-      child: AppCardContainer(
-        padding: EdgeInsets.zero,
-        borderRadius: 32,
-        clipBehavior: Clip.antiAlias,
-        child: isDesktop
-            ? IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(flex: 6, child: _buildHeroImage()),
-                    Expanded(flex: 4, child: _buildHeroDetails()),
-                  ],
-                ),
-              )
-            : Column(
-                children: [
-                  AspectRatio(aspectRatio: 16 / 9, child: _buildHeroImage()),
-                  _buildHeroDetails(),
-                ],
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildBreadcrumbs(),
+          const SizedBox(height: 24),
+          AppCardContainer(
+            padding: EdgeInsets.zero,
+            borderRadius: 32,
+            clipBehavior: Clip.antiAlias,
+            child: isDesktop
+                ? IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(flex: 6, child: _buildHeroImage()),
+                        Expanded(flex: 4, child: _buildHeroDetails()),
+                      ],
+                    ),
+                  )
+                : Column(
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: _buildHeroImage(),
+                      ),
+                      _buildHeroDetails(),
+                    ],
+                  ),
+          ),
+        ],
       ),
     );
   }
