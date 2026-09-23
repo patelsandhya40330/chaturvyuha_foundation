@@ -18,7 +18,7 @@ import '../Events/events_screen.dart';
 class _DashboardLayout {
   static const tablet = 600.0;
   static const desktop = 1100.0;
-  static const logoSize = 60.0;
+  static const logoSize = 38.0;
   static const logoAsset = 'assets/chaturvedal-logo.png';
   static const memberIndex = 9;
 }

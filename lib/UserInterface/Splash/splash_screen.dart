@@ -89,37 +89,6 @@ class _SplashScreenState extends State<SplashScreen>
                       const Spacer(),
 
                       // Responsive Logo Container without tight circular clipping
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColor.lightPrimary.withAlpha(120),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColor.primary.withAlpha(25),
-                              blurRadius: 30,
-                              spreadRadius: 5,
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          "assets/chaturvedal-logo.png",
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.contain,
-                          semanticLabel: 'CHATURVEDA Foundation logo',
-                          errorBuilder: (context, error, stackTrace) {
-                            debugPrint('Splash logo failed: $error');
-                            // Safe icon fallback rather than attempting to load the failing asset again
-                            return const Icon(
-                              Icons.spa,
-                              size: 80,
-                              color: AppColor.primary,
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 32),
 
                       // Foundation Name
                       const Text(
